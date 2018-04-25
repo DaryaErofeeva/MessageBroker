@@ -20,7 +20,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.dyerofieieva.Main</mainClass>
+                            <mainClass>com.griddynamics.internship.messagebroker.Main</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
@@ -32,7 +32,7 @@
         </plugins>
     </build>
 
-    <groupId>com.dyerofieieva</groupId>
+    <groupId>com.griddynamics.internship.messagebroker</groupId>
     <artifactId>MessageBroker</artifactId>
     <version>1.0-SNAPSHOT</version>
 

@@ -1,4 +1,4 @@
-package com.dyerofieieva;
+package com.griddynamics.internship.messagebroker;
 
 public class EnvironmentalVariablesParameters {
     public static boolean setParameters(Parameters parameters) {

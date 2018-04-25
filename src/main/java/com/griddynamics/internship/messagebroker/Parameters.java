@@ -1,4 +1,4 @@
-package com.dyerofieieva;
+package com.griddynamics.internship.messagebroker;
 
 import com.beust.jcommander.Parameter;
 

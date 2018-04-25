@@ -1,4 +1,4 @@
-package com.dyerofieieva;
+package com.griddynamics.internship.messagebroker;
 
 public class Main {
     private static final Parameters parameters = new Parameters();

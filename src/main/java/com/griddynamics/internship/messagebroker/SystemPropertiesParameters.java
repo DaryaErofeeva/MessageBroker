@@ -1,4 +1,4 @@
-package com.dyerofieieva;
+package com.griddynamics.internship.messagebroker;
 
 import java.io.IOException;
 import java.io.InputStream;
