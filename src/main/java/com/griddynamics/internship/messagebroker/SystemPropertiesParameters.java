@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 public class SystemPropertiesParameters {
 
@@ -20,36 +21,31 @@ public class SystemPropertiesParameters {
     }
 
     private static void loadMissedSystemPropertiesFromFile() {
-        Map<String, String> properties = getSystemPropertiesMap();
+        Properties fileProperties = new Properties();
 
-        //check if any property is missed
-        if (properties.values().contains(null) || properties.values().contains("")) {
-
-            //load properties from file
-            try (InputStream inputStream = Main.class.getClassLoader().getResourceAsStream("my.properties")) {
-                System.getProperties().load(inputStream);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        try (InputStream inputStream = Main.class.getClassLoader().getResourceAsStream("my.properties")) {
+            fileProperties.load(inputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        setSystemPropertiesIfSet(properties);
+        setSystemProperties(fileProperties, "rootFolder", "foldersNumber", "filesNumber");
     }
 
-    private static Map<String, String> getSystemPropertiesMap() {
-        Map<String, String> properties = new HashMap<>();
-        putSystemProperty(properties, "rootFolder", "foldersNumber", "filesNumber");
-        return properties;
+    private static void setSystemProperties(Properties fileProperties, String... propertyNames) {
+        for (String propertyName : propertyNames) {
+            if (fileContainsMissed(fileProperties, propertyName))
+                System.setProperty(propertyName, fileProperties.getProperty(propertyName));
+        }
     }
 
-    private static void putSystemProperty(Map<String, String> properties, String... propertiesNames) {
-        for (String propertyName : propertiesNames)
-            properties.put(propertyName, System.getProperty(propertyName));
+    private static boolean fileContainsMissed(Properties fileProperties, String propertyName){
+        return !isSet(System.getProperties(), propertyName) &&
+                isSet(fileProperties, propertyName);
     }
 
-    private static void setSystemPropertiesIfSet(Map<String, String> properties) {
-        for (String key : properties.keySet())
-            if (properties.get(key) != null && !properties.get(key).equals(""))
-                System.setProperty(key, properties.get(key));
+    private static boolean isSet(Properties properties, String propertyName) {
+        return !(properties.getProperty(propertyName) == null ||
+                properties.getProperty(propertyName).equals(""));
     }
 }
