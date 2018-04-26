@@ -2,8 +2,6 @@ package com.griddynamics.internship.messagebroker;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 public class SystemPropertiesParameters {
@@ -11,11 +9,11 @@ public class SystemPropertiesParameters {
     public static boolean setParameters(Parameters parameters) {
         loadMissedSystemPropertiesFromFile();
         try {
-            parameters.setReceivedParameters(System.getProperty("rootFolder"),
+            parameters.setParameters(System.getProperty("rootFolder"),
                     Integer.valueOf(System.getProperty("foldersNumber")),
                     Integer.valueOf(System.getProperty("filesNumber")));
         } catch (NumberFormatException e) {
-            return false;
+            return EnvironmentalVariablesParameters.setParameters(parameters);
         }
         return true;
     }
@@ -39,7 +37,7 @@ public class SystemPropertiesParameters {
         }
     }
 
-    private static boolean fileContainsMissed(Properties fileProperties, String propertyName){
+    private static boolean fileContainsMissed(Properties fileProperties, String propertyName) {
         return !isSet(System.getProperties(), propertyName) &&
                 isSet(fileProperties, propertyName);
     }
