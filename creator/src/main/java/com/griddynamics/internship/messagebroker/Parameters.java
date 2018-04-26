@@ -47,7 +47,11 @@ public class Parameters {
         this.filesNumber = filesNumber;
     }
 
-    public void setReceivedParameters(String rootFolder, int foldersNumber, int filesNumber) {
+    public boolean setParameters(String[] args) {
+        return MainParameters.setParameters(this, args);
+    }
+
+    public void setParameters(String rootFolder, int foldersNumber, int filesNumber) {
         this.setRootFolder(rootFolder);
         this.setFoldersNumber(foldersNumber);
         this.setFilesNumber(filesNumber);

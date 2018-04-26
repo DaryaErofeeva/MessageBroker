@@ -25,7 +25,7 @@ public class MainParameters {
         } catch (ParameterException ex) {
             ex.printStackTrace();
             showUsage(jCommander);
-            return false;
+            return SystemPropertiesParameters.setParameters(parameters);
         }
 
         return true;
