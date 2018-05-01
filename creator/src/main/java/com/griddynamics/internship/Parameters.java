@@ -1,4 +1,4 @@
-package com.griddynamics.internship.messagebroker;
+package com.griddynamics.internship;
 
 import com.beust.jcommander.Parameter;
 
@@ -47,8 +47,20 @@ public class Parameters {
         this.filesNumber = filesNumber;
     }
 
-    public boolean setParameters(String[] args) {
-        return MainParameters.setParameters(this, args);
+    public static Parameters getFilledParameters(CreatorJCommander jCommander, String... args) {
+        ParametersSetter parametersSetter = new MainParameters(jCommander, args)
+                .setNextParametersSetter(
+                        new SystemPropertiesParameters()
+                                .setNextParametersSetter(
+                                        new EnvironmentalVariablesParameters()));
+
+        return parametersSetter.getFilledParameters();
+    }
+
+    public boolean isValid() {
+        return !(this.getRootFolder() == null ||
+                this.getRootFolder().isEmpty() ||
+                this.getFoldersNumber() == 0);
     }
 
     public void setParameters(String rootFolder, int foldersNumber, int filesNumber) {

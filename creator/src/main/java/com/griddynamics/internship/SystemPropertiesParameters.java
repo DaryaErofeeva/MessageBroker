@@ -1,24 +1,24 @@
-package com.griddynamics.internship.messagebroker;
+package com.griddynamics.internship;
+
+import com.beust.jcommander.JCommander;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class SystemPropertiesParameters {
+public class SystemPropertiesParameters extends ParametersSetter {
 
-    public static boolean setParameters(Parameters parameters) {
+    @Override
+    protected void setParameters() throws NumberFormatException {
         loadMissedSystemPropertiesFromFile();
-        try {
-            parameters.setParameters(System.getProperty("rootFolder"),
-                    Integer.valueOf(System.getProperty("foldersNumber")),
-                    Integer.valueOf(System.getProperty("filesNumber")));
-        } catch (NumberFormatException e) {
-            return EnvironmentalVariablesParameters.setParameters(parameters);
-        }
-        return true;
+
+        getParameters().setParameters(System.getProperty("rootFolder"),
+                Integer.valueOf(System.getProperty("foldersNumber")),
+                Integer.valueOf(System.getProperty("filesNumber")));
     }
 
-    private static void loadMissedSystemPropertiesFromFile() {
+
+    private void loadMissedSystemPropertiesFromFile() {
         Properties fileProperties = new Properties();
 
         try (InputStream inputStream = Main.class.getClassLoader().getResourceAsStream("my.properties")) {
@@ -30,19 +30,19 @@ public class SystemPropertiesParameters {
         setSystemProperties(fileProperties, "rootFolder", "foldersNumber", "filesNumber");
     }
 
-    private static void setSystemProperties(Properties fileProperties, String... propertyNames) {
+    private void setSystemProperties(Properties fileProperties, String... propertyNames) {
         for (String propertyName : propertyNames) {
             if (fileContainsMissed(fileProperties, propertyName))
                 System.setProperty(propertyName, fileProperties.getProperty(propertyName));
         }
     }
 
-    private static boolean fileContainsMissed(Properties fileProperties, String propertyName) {
+    private boolean fileContainsMissed(Properties fileProperties, String propertyName) {
         return !isSet(System.getProperties(), propertyName) &&
                 isSet(fileProperties, propertyName);
     }
 
-    private static boolean isSet(Properties properties, String propertyName) {
+    private boolean isSet(Properties properties, String propertyName) {
         return !(properties.getProperty(propertyName) == null ||
                 properties.getProperty(propertyName).equals(""));
     }

@@ -1,4 +1,4 @@
-package com.griddynamics.internship.messagebroker;
+package com.griddynamics.internship;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -7,6 +7,7 @@ import java.io.Writer;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Creator {
+
     private Parameters parameters;
 
     public Creator(Parameters parameters) {
