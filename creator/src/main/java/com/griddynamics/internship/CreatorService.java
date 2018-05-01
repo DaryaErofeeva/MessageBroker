@@ -1,18 +1,20 @@
 package com.griddynamics.internship;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class Creator {
+@Service
+public class CreatorService {
 
+    @Autowired
     private Parameters parameters;
-
-    public Creator(Parameters parameters) {
-        this.parameters = parameters;
-    }
 
     public void create() {
         try {

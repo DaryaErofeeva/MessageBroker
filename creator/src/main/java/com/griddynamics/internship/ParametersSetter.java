@@ -1,16 +1,18 @@
 package com.griddynamics.internship;
 
-import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public abstract class ParametersSetter {
+    @Autowired
     private Parameters parameters;
     private ParametersSetter nextParametersSetter;
 
-    public ParametersSetter() {
-        parameters = new Parameters();
-    }
+//    public ParametersSetter() {
+//        parameters = new Parameters();
+//    }
 
     public Parameters getParameters() {
         return parameters;

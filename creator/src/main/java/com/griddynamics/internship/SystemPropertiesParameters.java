@@ -1,11 +1,13 @@
 package com.griddynamics.internship;
 
 import com.beust.jcommander.JCommander;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+@Component
 public class SystemPropertiesParameters extends ParametersSetter {
 
     @Override
