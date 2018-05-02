@@ -1,8 +1,11 @@
 package com.griddynamics.internship;
 
 import com.beust.jcommander.Parameter;
+import org.springframework.stereotype.Component;
 
+@Component
 public class Parameters {
+
     @Parameter(names = {"-?", "--help"}, help = true,
             description = "Displays help information")
     private boolean help = false;
@@ -45,16 +48,6 @@ public class Parameters {
 
     public void setFilesNumber(int filesNumber) {
         this.filesNumber = filesNumber;
-    }
-
-    public static Parameters getFilledParameters(CreatorJCommander jCommander, String... args) {
-        ParametersSetter parametersSetter = new MainParameters(jCommander, args)
-                .setNextParametersSetter(
-                        new SystemPropertiesParameters()
-                                .setNextParametersSetter(
-                                        new EnvironmentalVariablesParameters()));
-
-        return parametersSetter.getFilledParameters();
     }
 
     public boolean isValid() {
