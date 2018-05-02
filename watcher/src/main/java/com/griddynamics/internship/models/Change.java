@@ -8,6 +8,15 @@ public class Change {
     private String content;
     private Timestamp timestamp;
 
+    public Change() {
+    }
+
+    public Change(Message message, String content, Timestamp timestamp) {
+        this.message = message;
+        this.content = content;
+        this.timestamp = timestamp;
+    }
+
     public int getId() {
         return id;
     }

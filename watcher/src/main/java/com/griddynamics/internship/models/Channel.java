@@ -5,6 +5,13 @@ public class Channel {
     private String path;
     private String name;
 
+    public Channel(){}
+
+    public Channel(String path, String name) {
+        this.path = path;
+        this.name = name;
+    }
+
     public int getId() {
         return id;
     }

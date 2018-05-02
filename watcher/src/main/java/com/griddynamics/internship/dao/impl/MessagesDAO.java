@@ -1,7 +1,9 @@
 package com.griddynamics.internship.dao.impl;
 
+import com.griddynamics.internship.dao.DAOFactory;
 import com.griddynamics.internship.dao.DatabaseConnection;
 import com.griddynamics.internship.dao.GenericDAO;
+import com.griddynamics.internship.models.Change;
 import com.griddynamics.internship.models.Channel;
 import com.griddynamics.internship.models.Message;
 
@@ -22,7 +24,7 @@ public class MessagesDAO implements GenericDAO<Message, Integer> {
             while ((resultSet.next())) {
                 Message message = new Message();
                 message.setId(resultSet.getInt(1));
-                message.setChannel(resultSet.getObject(2, Channel.class));
+                message.setChannel(DAOFactory.getInstance().getChannelsDAO().getEntityById(resultSet.getInt(2)));
                 message.setName(resultSet.getString(3));
                 messages.add(message);
             }
@@ -34,22 +36,95 @@ public class MessagesDAO implements GenericDAO<Message, Integer> {
 
     @Override
     public int update(Message entity) {
-        return 0;
+        int affectedRowsAmount = 0;
+        try (Connection connection = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("UPDATE MESSAGES " +
+                     "SET CHANNEL_ID = ?, NAME = ?" +
+                     "WHERE ID = ?")) {
+            preparedStatement.setInt(1, entity.getChannel().getId());
+            preparedStatement.setString(2, entity.getName());
+            preparedStatement.setInt(3, entity.getId());
+            affectedRowsAmount = preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return affectedRowsAmount;
     }
 
     @Override
     public Message getEntityById(Integer id) {
-        return null;
+        Message message = new Message();
+        try (Connection connection = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM MESSAGES WHERE ID = ?")) {
+            preparedStatement.setInt(1, id);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while ((resultSet.next())) {
+                    message.setId(resultSet.getInt(1));
+                    message.setChannel(DAOFactory.getInstance().getChannelsDAO().getEntityById(resultSet.getInt(2)));
+                    message.setName(resultSet.getString(3));
+                    break;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return message;
     }
 
     @Override
     public int delete(Integer id) {
-        return 0;
+        int affectedRowsAmount = 0;
+        try (Connection connection = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM MESSAGES WHERE ID = ?")) {
+            preparedStatement.setInt(1, id);
+            affectedRowsAmount = preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return affectedRowsAmount;
     }
 
     @Override
     public int create(Message entity) {
-        return 0;
+        int affectedRowsAmount = 0;
+
+        try (Connection connection = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO MESSAGES " +
+                     "(CHANNEL_ID, NAME) VALUES (?, ?)")) {
+            preparedStatement.setInt(1, entity.getChannel().getId());
+            preparedStatement.setString(2, entity.getName());
+
+            affectedRowsAmount = preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return affectedRowsAmount;
+    }
+
+    @Override
+    public Integer getIdByEntity(Message entity) {
+        int id = 0;
+        try (Connection connection = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT ID FROM MESSAGES WHERE CHANNEL_ID = ? AND NAME = ?")) {
+            preparedStatement.setInt(1, entity.getChannel().getId());
+            preparedStatement.setString(2, entity.getName());
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while ((resultSet.next())) {
+                    id = resultSet.getInt(1);
+                    break;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return id;
+    }
+
+    @Override
+    public Message createEntityIfNotExists(Message entity) {
+        if (getIdByEntity(entity) == 0) create(entity);
+        entity.setId(getIdByEntity(entity));
+        return entity;
     }
 }
 
