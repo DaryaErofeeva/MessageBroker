@@ -1,7 +1,9 @@
 package com.griddynamics.internship;
 
 import com.beust.jcommander.JCommander;
+import org.springframework.stereotype.Service;
 
+@Service
 public class CreatorJCommander {
 
     private JCommander jCommander;

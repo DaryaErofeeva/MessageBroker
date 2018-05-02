@@ -1,5 +1,8 @@
 package com.griddynamics.internship;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class EnvironmentalVariablesParameters extends ParametersSetter {
 
     @Override
