@@ -5,6 +5,14 @@ public class Message {
     private Channel channel;
     private String name;
 
+    public Message() {
+    }
+
+    public Message(Channel channel, String name) {
+        this.channel = channel;
+        this.name = name;
+    }
+
     public int getId() {
         return id;
     }
