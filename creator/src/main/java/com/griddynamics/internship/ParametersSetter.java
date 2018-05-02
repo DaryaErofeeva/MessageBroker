@@ -10,10 +10,6 @@ public abstract class ParametersSetter {
     private Parameters parameters;
     private ParametersSetter nextParametersSetter;
 
-//    public ParametersSetter() {
-//        parameters = new Parameters();
-//    }
-
     public Parameters getParameters() {
         return parameters;
     }

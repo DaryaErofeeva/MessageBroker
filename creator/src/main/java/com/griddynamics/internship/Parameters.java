@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class Parameters {
+
     @Parameter(names = {"-?", "--help"}, help = true,
             description = "Displays help information")
     private boolean help = false;

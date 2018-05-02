@@ -1,18 +1,14 @@
 package com.griddynamics.internship;
 
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-@Service
-public class ParametersService {
-
-    @Autowired
-    private Parameters parameters;
-
-    @Autowired
-    private CreatorJCommander jCommander;
-
+@Component(value = "parametersFactory")
+public class ParametersFactory implements FactoryBean<Parameters> {
     @Autowired
     private MainParameters mainParameters;
 
@@ -22,11 +18,8 @@ public class ParametersService {
     @Autowired
     private EnvironmentalVariablesParameters environmentalVariablesParameters;
 
-    @Autowired
-    private CreatorService creator;
-
-    @Bean
-    public Parameters getFilledParameters() {
+    @Override
+    public Parameters getObject() throws Exception {
         mainParameters
                 .setNextParametersSetter(
                         systemPropertiesParameters
@@ -36,9 +29,13 @@ public class ParametersService {
         return mainParameters.getFilledParameters();
     }
 
-    public void run() {
-        if (parameters.isValid() && !parameters.isHelp())
-            creator.create();
-        else jCommander.usage();
+    @Override
+    public Class<Parameters> getObjectType() {
+        return Parameters.class;
+    }
+
+    @Override
+    public boolean isSingleton() {
+        return true;
     }
 }

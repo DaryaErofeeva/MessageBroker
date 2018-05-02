@@ -5,14 +5,21 @@ import org.springframework.boot.Banner;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.DependsOn;
 
 import javax.annotation.Resource;
 
 @SpringBootApplication
+@DependsOn("parametersFactory")
 public class Main implements CommandLineRunner {
+    @Autowired
+    private Parameters parameters;
 
     @Autowired
-    private ParametersService parametersService;
+    private CreatorJCommander jCommander;
+
+    @Autowired
+    private CreatorService creator;
 
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication(Main.class);
@@ -22,6 +29,8 @@ public class Main implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        parametersService.run();
+        if (parameters.isValid() && !parameters.isHelp())
+            creator.create();
+        else jCommander.usage();
     }
 }
