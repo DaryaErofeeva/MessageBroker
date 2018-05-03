@@ -4,6 +4,7 @@ import com.griddynamics.internship.dao.GenericDAO;
 import com.griddynamics.internship.models.Channel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -11,15 +12,10 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-@DependsOn("source")
 public class ChannelsDAO implements GenericDAO<Channel, Integer> {
 
-    private JdbcTemplate jdbcTemplate;
-
     @Autowired
-    public ChannelsDAO(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
+    private JdbcTemplate jdbcTemplate;
 
     @Override
     public List<Channel> getAll() {
@@ -51,8 +47,12 @@ public class ChannelsDAO implements GenericDAO<Channel, Integer> {
 
     @Override
     public Integer getIdByEntity(Channel entity) {
-        return jdbcTemplate.queryForObject("SELECT ID FROM CHANNELS WHERE PATH = ? AND NAME = ?",
-                new Object[]{entity.getPath(), entity.getName()}, Integer.class);
+        try {
+            return jdbcTemplate.queryForObject("SELECT ID FROM CHANNELS WHERE PATH = ? AND NAME = ?",
+                    new Object[]{entity.getPath(), entity.getName()}, Integer.class);
+        } catch (EmptyResultDataAccessException e) {
+            return 0;
+        }
     }
 
     @Override

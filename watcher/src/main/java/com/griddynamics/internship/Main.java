@@ -5,7 +5,6 @@ import org.springframework.boot.Banner;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.DependsOn;
 
 import java.io.IOException;
 
@@ -13,7 +12,7 @@ import java.io.IOException;
 public class Main implements CommandLineRunner {
 
     @Autowired
-    private WatcherService watcherService;
+    private PollService pollService;
 
     public static void main(String[] args) throws IOException, InterruptedException {
         SpringApplication app = new SpringApplication(Main.class);
@@ -23,6 +22,6 @@ public class Main implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        watcherService.poll();
+        pollService.poll();
     }
 }

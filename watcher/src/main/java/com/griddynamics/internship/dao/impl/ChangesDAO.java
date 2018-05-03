@@ -4,6 +4,7 @@ import com.griddynamics.internship.dao.GenericDAO;
 import com.griddynamics.internship.models.Change;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -11,15 +12,10 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-@DependsOn("source")
 public class ChangesDAO implements GenericDAO<Change, Integer> {
 
-    private JdbcTemplate jdbcTemplate;
-
     @Autowired
-    public ChangesDAO(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
+    private JdbcTemplate jdbcTemplate;
 
     @Override
     public List<Change> getAll() {
@@ -51,8 +47,12 @@ public class ChangesDAO implements GenericDAO<Change, Integer> {
 
     @Override
     public Integer getIdByEntity(Change entity) {
-        return jdbcTemplate.queryForObject("SELECT ID FROM CHANGES WHERE MESSAGE_ID = ? AND TIMESTAMP = ?",
-                new Object[]{entity.getMessageId(), entity.getTimestamp()}, Integer.class);
+        try {
+            return jdbcTemplate.queryForObject("SELECT ID FROM CHANGES WHERE MESSAGE_ID = ? AND TIMESTAMP = ?",
+                    new Object[]{entity.getMessageId(), entity.getTimestamp()}, Integer.class);
+        } catch (EmptyResultDataAccessException e) {
+            return 0;
+        }
     }
 
     @Override

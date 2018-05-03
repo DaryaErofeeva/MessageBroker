@@ -10,6 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>watcher</artifactId>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
@@ -17,10 +18,9 @@
             <artifactId>h2</artifactId>
             <version>1.4.196</version>
         </dependency>
-
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
     </dependencies>
 </project>
