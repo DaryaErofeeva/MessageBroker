@@ -1,127 +1,63 @@
 package com.griddynamics.internship.dao.impl;
 
-import com.griddynamics.internship.dao.DatabaseConnection;
 import com.griddynamics.internship.dao.GenericDAO;
-import com.griddynamics.internship.models.Change;
 import com.griddynamics.internship.models.Channel;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
+@Repository
+@DependsOn("source")
 public class ChannelsDAO implements GenericDAO<Channel, Integer> {
+
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    public ChannelsDAO(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
     @Override
     public List<Channel> getAll() {
-        List<Channel> channels = new ArrayList<>();
-        try (Connection connection = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM CHANNELS");
-             ResultSet resultSet = preparedStatement.executeQuery()) {
-            while ((resultSet.next())) {
-                Channel channel = new Channel();
-                channel.setId(resultSet.getInt(1));
-                channel.setPath(resultSet.getString(2));
-                channel.setName(resultSet.getString(3));
-                channels.add(channel);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return channels;
+        return jdbcTemplate.query("SELECT * FROM CHANNELS", new BeanPropertyRowMapper(Channel.class));
     }
 
     @Override
     public int update(Channel entity) {
-        int affectedRowsAmount = 0;
-        try (Connection connection = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("UPDATE CHANNELS " +
-                     "SET PATH = ?, NAME = ?" +
-                     "WHERE ID = ?")) {
-            preparedStatement.setString(1, entity.getPath());
-            preparedStatement.setString(2, entity.getName());
-            preparedStatement.setInt(3, entity.getId());
-            affectedRowsAmount = preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return affectedRowsAmount;
+        return jdbcTemplate.update("UPDATE CHANNELS SET PATH = ?, NAME = ? WHERE ID = ?",
+                entity.getPath(), entity.getName(), entity.getId());
     }
 
     @Override
     public Channel getEntityById(Integer id) {
-        Channel channel = new Channel();
-        try (Connection connection = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM CHANNELS WHERE ID = ?")) {
-            preparedStatement.setInt(1, id);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while ((resultSet.next())) {
-                    channel.setId(resultSet.getInt(1));
-                    channel.setPath(resultSet.getString(2));
-                    channel.setName(resultSet.getString(3));
-                    break;
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return channel;
+        return (Channel) jdbcTemplate.queryForObject("SELECT * FROM CHANNELS WHERE ID = ?",
+                new Object[]{id}, new BeanPropertyRowMapper(Channel.class));
     }
 
     @Override
     public int delete(Integer id) {
-        int affectedRowsAmount = 0;
-        try (Connection connection = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM CHANNELS WHERE ID = ?")) {
-            preparedStatement.setInt(1, id);
-            affectedRowsAmount = preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return affectedRowsAmount;
+        return jdbcTemplate.update("DELETE FROM CHANNELS WHERE ID = ?", id);
     }
 
     @Override
     public int create(Channel entity) {
-        int affectedRowsAmount = 0;
-
-        try (Connection connection = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO CHANNELS " +
-                     "(PATH, NAME) VALUES (?, ?)")) {
-            preparedStatement.setString(1, entity.getPath());
-            preparedStatement.setString(2, entity.getName());
-
-            affectedRowsAmount = preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return affectedRowsAmount;
+        return jdbcTemplate.update("INSERT INTO CHANNELS (PATH, NAME) VALUES (?, ?)",
+                entity.getPath(), entity.getName());
     }
 
     @Override
     public Integer getIdByEntity(Channel entity) {
-        int id = 0;
-        try (Connection connection = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT ID FROM CHANNELS WHERE PATH = ? AND NAME = ?")) {
-            preparedStatement.setString(1, entity.getPath());
-            preparedStatement.setString(2, entity.getName());
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while ((resultSet.next())) {
-                    id = resultSet.getInt(1);
-                    break;
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return id;
+        return jdbcTemplate.queryForObject("SELECT ID FROM CHANNELS WHERE PATH = ? AND NAME = ?",
+                new Object[]{entity.getPath(), entity.getName()}, Integer.class);
     }
 
     @Override
     public Channel createEntityIfNotExists(Channel entity) {
-        if (getIdByEntity(entity) == 0)
-            create(entity);
+        if (getIdByEntity(entity) == 0) create(entity);
         entity.setId(getIdByEntity(entity));
         return entity;
     }

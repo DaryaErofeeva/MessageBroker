@@ -1,12 +1,12 @@
 package com.griddynamics.internship;
 
-import com.griddynamics.internship.dao.DAOFactory;
 import com.griddynamics.internship.dao.impl.ChangesDAO;
 import com.griddynamics.internship.dao.impl.ChannelsDAO;
 import com.griddynamics.internship.dao.impl.MessagesDAO;
 import com.griddynamics.internship.models.Change;
 import com.griddynamics.internship.models.Channel;
 import com.griddynamics.internship.models.Message;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -25,9 +25,13 @@ public class WatcherService {
     @Value("${rootFolder}")
     private String rootFolder;
 
-    private DAOFactory daoFactory;
+    @Autowired
     private ChannelsDAO channelsDAO;
+
+    @Autowired
     private MessagesDAO messagesDAO;
+
+    @Autowired
     private ChangesDAO changesDAO;
 
     private WatchService watcher;
@@ -36,11 +40,6 @@ public class WatcherService {
     public void poll() throws IOException {
         this.watcher = FileSystems.getDefault().newWatchService();
         this.keys = new HashMap<>();
-
-        daoFactory = DAOFactory.getInstance();
-        channelsDAO = daoFactory.getChannelsDAO();
-        messagesDAO = daoFactory.getMessagesDAO();
-        changesDAO = daoFactory.getChangesDAO();
 
         walkAndRegisterDirectories(Paths.get(rootFolder));
 
@@ -90,10 +89,10 @@ public class WatcherService {
 
     private void insert(Path path) {
         try {
-            changesDAO.createEntityIfNotExists(new Change(
-                    messagesDAO.createEntityIfNotExists(
+            changesDAO.create(new Change(
+                    messagesDAO.create(
                             new Message(
-                                    channelsDAO.createEntityIfNotExists(
+                                    channelsDAO.create(
                                             new Channel(
                                                     path.getParent().toAbsolutePath().toString(),
                                                     path.getParent().getFileName().toString())),

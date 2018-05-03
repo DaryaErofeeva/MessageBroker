@@ -4,15 +4,15 @@ import java.sql.Timestamp;
 
 public class Change {
     private int id;
-    private Message message;
+    private int messageId;
     private String content;
     private Timestamp timestamp;
 
     public Change() {
     }
 
-    public Change(Message message, String content, Timestamp timestamp) {
-        this.message = message;
+    public Change(int messageId, String content, Timestamp timestamp) {
+        this.messageId = messageId;
         this.content = content;
         this.timestamp = timestamp;
     }
@@ -25,12 +25,12 @@ public class Change {
         this.id = id;
     }
 
-    public Message getMessage() {
-        return message;
+    public int getMessageId() {
+        return messageId;
     }
 
-    public void setMessage(Message message) {
-        this.message = message;
+    public void setMessageId(int messageId) {
+        this.messageId = messageId;
     }
 
     public String getContent() {
