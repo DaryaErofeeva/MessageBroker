@@ -4,6 +4,7 @@ import com.griddynamics.internship.dao.GenericDAO;
 import com.griddynamics.internship.models.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -11,15 +12,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-@DependsOn("source")
 public class MessagesDAO implements GenericDAO<Message, Integer> {
-
-    private JdbcTemplate jdbcTemplate;
-
     @Autowired
-    public MessagesDAO(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
+    private JdbcTemplate jdbcTemplate;
 
     @Override
     public List<Message> getAll() {
@@ -51,8 +46,12 @@ public class MessagesDAO implements GenericDAO<Message, Integer> {
 
     @Override
     public Integer getIdByEntity(Message entity) {
-        return jdbcTemplate.queryForObject("SELECT ID FROM MESSAGES WHERE CHANNEL_ID = ? AND NAME = ?",
-                new Object[]{entity.getChannelId(), entity.getName()}, Integer.class);
+        try {
+            return jdbcTemplate.queryForObject("SELECT ID FROM MESSAGES WHERE CHANNEL_ID = ? AND NAME = ?",
+                    new Object[]{entity.getChannelId(), entity.getName()}, Integer.class);
+        } catch (EmptyResultDataAccessException e) {
+            return 0;
+        }
     }
 
     @Override
