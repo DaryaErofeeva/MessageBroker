@@ -11,6 +11,7 @@
     <modules>
         <module>creator</module>
         <module>reader</module>
+        <module>watcher</module>
     </modules>
 
     <parent>
