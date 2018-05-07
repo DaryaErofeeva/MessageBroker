@@ -1,4 +1,4 @@
-package com.griddynamics.internship;
+package com.griddynamics.internship.watcher.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

@@ -1,8 +1,6 @@
-package com.griddynamics.internship;
+package com.griddynamics.internship.watcher.services;
 
-import com.griddynamics.internship.dao.impl.ChangesDAO;
-import com.griddynamics.internship.dao.impl.ChannelsDAO;
-import com.griddynamics.internship.dao.impl.MessagesDAO;
+import com.griddynamics.internship.dao.DAOFactory;
 import com.griddynamics.internship.models.Change;
 import com.griddynamics.internship.models.Channel;
 import com.griddynamics.internship.models.Message;
@@ -17,24 +15,18 @@ import java.sql.Timestamp;
 @Service
 public class DatabaseService {
     @Autowired
-    private ChannelsDAO channelsDAO;
-
-    @Autowired
-    private MessagesDAO messagesDAO;
-
-    @Autowired
-    private ChangesDAO changesDAO;
+    private DAOFactory daoFactory;
 
     public void insert(Path path) {
         try {
-            changesDAO.createEntityIfNotExists(new Change(
-                    messagesDAO.createEntityIfNotExists(
+            daoFactory.getChangesDAO().createEntityIfNotExists(new Change(
+                    daoFactory.getMessagesDAO().createEntityIfNotExists(
                             new Message(
-                                    channelsDAO.createEntityIfNotExists(
+                                    daoFactory.getChannelsDAO().createEntityIfNotExists(
                                             new Channel(
                                                     path.getParent().toAbsolutePath().toString(),
-                                                    path.getParent().getFileName().toString())).getId(),
-                                    path.getFileName().toString())).getId(),
+                                                    path.getParent().getFileName().toString())),
+                                    path.getFileName().toString())),
                     new String(Files.readAllBytes(path)),
                     new Timestamp(System.currentTimeMillis())));
         } catch (IOException e) {
