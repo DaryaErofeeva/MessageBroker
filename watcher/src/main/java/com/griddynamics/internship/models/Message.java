@@ -2,14 +2,14 @@ package com.griddynamics.internship.models;
 
 public class Message {
     private int id;
-    private Channel channel;
+    private int channelId;
     private String name;
 
     public Message() {
     }
 
-    public Message(Channel channel, String name) {
-        this.channel = channel;
+    public Message(int channelId, String name) {
+        this.channelId = channelId;
         this.name = name;
     }
 
@@ -21,12 +21,12 @@ public class Message {
         this.id = id;
     }
 
-    public Channel getChannel() {
-        return channel;
+    public int getChannelId() {
+        return channelId;
     }
 
-    public void setChannel(Channel channel) {
-        this.channel = channel;
+    public void setChannelId(int channelId) {
+        this.channelId = channelId;
     }
 
     public String getName() {
@@ -35,14 +35,5 @@ public class Message {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        return "Message{" +
-                "id=" + id +
-                ", channel=" + channel +
-                ", name='" + name + '\'' +
-                '}';
     }
 }
