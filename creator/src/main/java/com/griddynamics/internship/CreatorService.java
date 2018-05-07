@@ -27,7 +27,7 @@ public class CreatorService {
         for (int i = 0; i < parameters.getFoldersNumber(); i++) {
             String directoryName = createDirectory(parameters.getRootFolder());
             for (int j = 0; j < parameters.getFilesNumber(); j++)
-                writeDataToFile(createFile(directoryName));
+                move(writeDataToFile(createFile(directoryName)));
         }
     }
 
@@ -52,11 +52,16 @@ public class CreatorService {
         return file;
     }
 
-    private void writeDataToFile(File file) {
+    private File writeDataToFile(File file) {
         try (Writer writer = new FileWriter(file)) {
             writer.write(String.valueOf(System.currentTimeMillis()));
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return file;
+    }
+
+    private void move(File file) {
+        file.renameTo(new File("processed_" + parameters.getRootFolder() + file.getName()));
     }
 }
