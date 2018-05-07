@@ -9,23 +9,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 @Service
 public class MoverService {
     @Value("${rootFolder}")
     private Path rootFolder;
 
-    private List<String> paths=new ArrayList<>();
-
     public void move(Path path) {
-
-        if(paths.contains(path.toAbsolutePath().toString()))
-            System.out.println("problem");
-        paths.add(path.toAbsolutePath().toString());
-
         try {
             String processedPath = "processed_" + rootFolder.getFileName() + "/"
                     + rootFolder.relativize(path.getParent()).toString();

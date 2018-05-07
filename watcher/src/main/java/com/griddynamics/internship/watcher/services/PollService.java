@@ -5,7 +5,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
 
 @Service
 public class PollService {
@@ -38,12 +41,13 @@ public class PollService {
 
     private void processReceivedKey(WatchKey key) throws IOException {
         for (WatchEvent<?> event : key.pollEvents())
-                    walkFileTree(((Path) key.watchable())
-                        .resolve((Path) event.context()));
+            walkFileTree(((Path) key.watchable())
+                    .resolve((Path) event.context()));
         key.reset();
     }
 
     private void walkFileTree(Path path) throws IOException {
-        Files.walkFileTree(path, fileVisitorService);
+        if (Files.exists(path))
+            Files.walkFileTree(path, fileVisitorService);
     }
 }
