@@ -1,15 +1,18 @@
 package com.griddynamics.internship.models;
 
+import com.fasterxml.jackson.annotation.JsonRootName;
+
+@JsonRootName("message")
 public class Message {
     private int id;
-    private int channelId;
+    private Channel channel;
     private String name;
 
     public Message() {
     }
 
-    public Message(int channelId, String name) {
-        this.channelId = channelId;
+    public Message(Channel channel, String name) {
+        this.channel = channel;
         this.name = name;
     }
 
@@ -21,12 +24,12 @@ public class Message {
         this.id = id;
     }
 
-    public int getChannelId() {
-        return channelId;
+    public Channel getChannel() {
+        return channel;
     }
 
-    public void setChannelId(int channelId) {
-        this.channelId = channelId;
+    public void setChannel(Channel channel) {
+        this.channel = channel;
     }
 
     public String getName() {

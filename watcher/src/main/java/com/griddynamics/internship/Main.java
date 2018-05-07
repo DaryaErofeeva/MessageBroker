@@ -1,5 +1,6 @@
 package com.griddynamics.internship;
 
+import com.griddynamics.internship.watcher.services.PollService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.Banner;
 import org.springframework.boot.CommandLineRunner;

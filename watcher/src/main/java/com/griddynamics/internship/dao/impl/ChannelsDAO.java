@@ -1,9 +1,9 @@
 package com.griddynamics.internship.dao.impl;
 
 import com.griddynamics.internship.dao.GenericDAO;
+import com.griddynamics.internship.dao.row.mappers.ChannelMapper;
 import com.griddynamics.internship.models.Channel;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -17,9 +17,12 @@ public class ChannelsDAO implements GenericDAO<Channel, Integer> {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    private ChannelMapper channelMapper;
+
     @Override
     public List<Channel> getAll() {
-        return jdbcTemplate.query("SELECT * FROM CHANNELS", new BeanPropertyRowMapper(Channel.class));
+        return jdbcTemplate.query("SELECT * FROM CHANNELS", channelMapper);
     }
 
     @Override
@@ -30,8 +33,8 @@ public class ChannelsDAO implements GenericDAO<Channel, Integer> {
 
     @Override
     public Channel getEntityById(Integer id) {
-        return (Channel) jdbcTemplate.queryForObject("SELECT * FROM CHANNELS WHERE ID = ?",
-                new Object[]{id}, new BeanPropertyRowMapper(Channel.class));
+        return jdbcTemplate.queryForObject("SELECT * FROM CHANNELS WHERE ID = ?",
+                new Object[]{id}, channelMapper);
     }
 
     @Override

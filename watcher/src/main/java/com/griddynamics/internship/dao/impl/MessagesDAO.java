@@ -1,11 +1,11 @@
 package com.griddynamics.internship.dao.impl;
 
+import com.griddynamics.internship.dao.DAOFactory;
 import com.griddynamics.internship.dao.GenericDAO;
+import com.griddynamics.internship.dao.row.mappers.MessageMapper;
 import com.griddynamics.internship.models.Message;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -13,24 +13,32 @@ import java.util.List;
 
 @Repository
 public class MessagesDAO implements GenericDAO<Message, Integer> {
+
+    @Autowired
+    private DAOFactory daoFactory;
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    private MessageMapper messageMapper;
+
     @Override
     public List<Message> getAll() {
-        return jdbcTemplate.query("SELECT * FROM MESSAGES", new BeanPropertyRowMapper(Message.class));
+        return jdbcTemplate.query("SELECT * FROM MESSAGES", messageMapper);
     }
 
     @Override
     public int update(Message entity) {
+        daoFactory.getChannelsDAO().update(entity.getChannel());
         return jdbcTemplate.update("UPDATE MESSAGES SET CHANNEL_ID = ?, NAME = ? WHERE ID = ?",
-                entity.getChannelId(), entity.getName(), entity.getId());
+                entity.getChannel().getId(), entity.getName(), entity.getId());
     }
 
     @Override
     public Message getEntityById(Integer id) {
-        return (Message) jdbcTemplate.queryForObject("SELECT * FROM MESSAGES WHERE ID = ?",
-                new Object[]{id}, new BeanPropertyRowMapper(Message.class));
+        return jdbcTemplate.queryForObject("SELECT * FROM MESSAGES WHERE ID = ?",
+                new Object[]{id}, messageMapper);
     }
 
     @Override
@@ -41,14 +49,14 @@ public class MessagesDAO implements GenericDAO<Message, Integer> {
     @Override
     public int create(Message entity) {
         return jdbcTemplate.update("INSERT INTO MESSAGES (CHANNEL_ID, NAME) VALUES (?, ?)",
-                entity.getChannelId(), entity.getName());
+                entity.getChannel().getId(), entity.getName());
     }
 
     @Override
     public Integer getIdByEntity(Message entity) {
         try {
             return jdbcTemplate.queryForObject("SELECT ID FROM MESSAGES WHERE CHANNEL_ID = ? AND NAME = ?",
-                    new Object[]{entity.getChannelId(), entity.getName()}, Integer.class);
+                    new Object[]{entity.getChannel().getId(), entity.getName()}, Integer.class);
         } catch (EmptyResultDataAccessException e) {
             return 0;
         }
