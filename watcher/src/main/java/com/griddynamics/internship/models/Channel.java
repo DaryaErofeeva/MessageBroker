@@ -1,5 +1,8 @@
 package com.griddynamics.internship.models;
 
+import com.fasterxml.jackson.annotation.JsonRootName;
+
+@JsonRootName("channel")
 public class Channel {
     private int id;
     private String path;

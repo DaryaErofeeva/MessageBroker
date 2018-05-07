@@ -1,18 +1,21 @@
 package com.griddynamics.internship.models;
 
+import com.fasterxml.jackson.annotation.JsonRootName;
+
 import java.sql.Timestamp;
 
+@JsonRootName("change")
 public class Change {
     private int id;
-    private int messageId;
+    private Message message;
     private String content;
     private Timestamp timestamp;
 
     public Change() {
     }
 
-    public Change(int messageId, String content, Timestamp timestamp) {
-        this.messageId = messageId;
+    public Change(Message message, String content, Timestamp timestamp) {
+        this.message = message;
         this.content = content;
         this.timestamp = timestamp;
     }
@@ -25,12 +28,12 @@ public class Change {
         this.id = id;
     }
 
-    public int getMessageId() {
-        return messageId;
+    public Message getMessage() {
+        return message;
     }
 
-    public void setMessageId(int messageId) {
-        this.messageId = messageId;
+    public void setMessage(Message message) {
+        this.message = message;
     }
 
     public String getContent() {
