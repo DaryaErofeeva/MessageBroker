@@ -12,6 +12,7 @@
         <module>creator</module>
         <module>reader</module>
         <module>watcher</module>
+        <module>broker</module>
     </modules>
 
     <parent>
