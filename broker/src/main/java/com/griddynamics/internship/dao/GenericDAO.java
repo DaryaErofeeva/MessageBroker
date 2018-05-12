@@ -12,8 +12,4 @@ public interface GenericDAO<E, K> {
     int delete(K id);
 
     int create(E entity);
-
-    K getIdByEntity(E entity);
-
-    E createEntityIfNotExists(E entity);
 }
