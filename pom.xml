@@ -12,6 +12,8 @@
         <module>creator</module>
         <module>reader</module>
         <module>watcher</module>
+        <module>broker</module>
+        <module>producer</module>
     </modules>
 
     <parent>
@@ -26,6 +28,16 @@
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>1.16.20</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>
