@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ConsumerResponse {
     private int id;
-    private String name;
+    private String port;
 }

@@ -1,9 +1,11 @@
 package com.griddynamics.internship.resources;
 
 import com.griddynamics.internship.dao.DAOFactory;
+import com.griddynamics.internship.resources.senders.QueueMessageSender;
 import com.griddynamics.internship.models.entities.Message;
+import com.griddynamics.internship.models.entities.Queue;
 import com.griddynamics.internship.models.request.MessageRequest;
-import com.griddynamics.internship.models.response.ResponseError;
+import com.griddynamics.internship.models.response.ResponseMessage;
 import com.griddynamics.internship.models.response.plural.QueuesResponse;
 import com.griddynamics.internship.resources.model.mappers.MessageModelMapper;
 import com.griddynamics.internship.resources.model.mappers.QueueModelMapper;
@@ -32,6 +34,9 @@ public class QueueResource {
     @Autowired
     private MessageModelMapper messageModelMapper;
 
+    @Autowired
+    private QueueMessageSender queueMessageSender;
+
     @GET
     @Produces(MediaType.APPLICATION_JSON_VALUE)
     public Response getAllQueues() {
@@ -50,7 +55,7 @@ public class QueueResource {
         try {
             return Response.status(200).entity(queueModelMapper.convertToResponseObject(daoFactory.getQueueDAO().getEntityByName(name))).build();
         } catch (EmptyResultDataAccessException ex) {
-            return Response.status(400).entity(new ResponseError("No queue with such name")).build();
+            return Response.status(400).entity(new ResponseMessage("No queue with such name")).build();
         }
     }
 
@@ -61,7 +66,7 @@ public class QueueResource {
         try {
             return Response.status(200).entity(messageModelMapper.convertToResponseObject(daoFactory.getQueueDAO().getMessageByIdAndEntityName(name, id))).build();
         } catch (EmptyResultDataAccessException ex) {
-            return Response.status(400).entity(new ResponseError("In queue : '" + name + "' no message with id : '" + id + "'")).build();
+            return Response.status(400).entity(new ResponseMessage("In queue : '" + name + "' no message with id : '" + id + "'")).build();
         }
     }
 
@@ -71,13 +76,19 @@ public class QueueResource {
     @Produces(MediaType.APPLICATION_JSON_VALUE)
     public Response createMessage(@PathParam("name") String name, MessageRequest messageRequest) throws URISyntaxException {
 
-        if (messageRequest.getContent() == null || messageRequest.getState() == null)
-            return Response.status(400).entity(new Object[]{new ResponseError("Wrong input message format"), new MessageRequest()}).build();
+        if (messageRequest.getContent() == null)
+            return Response.status(400).entity(new Object[]{new ResponseMessage("Wrong input message format"), new MessageRequest()}).build();
 
         try {
             Message message = messageModelMapper.convertToEntity(messageRequest);
+            message.setState("put");
             message.setTimestamp(new Timestamp(System.currentTimeMillis()));
-            daoFactory.getQueueDAO().createMessage(daoFactory.getQueueDAO().getEntityByName(name), message);
+
+            Queue queue = daoFactory.getQueueDAO().getEntityByName(name);
+            daoFactory.getQueueDAO().createMessage(queue, message);
+
+            if (queue.getConsumers().size() > 0)
+                queueMessageSender.sendMessage(queue, message);
 
             return Response
                     .status(200)
@@ -85,7 +96,7 @@ public class QueueResource {
                     .contentLocation(new URI("/broker/v1/producer/queue/" + name + "/" + message.getId()))
                     .build();
         } catch (EmptyResultDataAccessException ex) {
-            return Response.status(400).entity(new ResponseError("No queue with such name")).build();
+            return Response.status(400).entity(new ResponseMessage("No queue with such name")).build();
         }
     }
 }

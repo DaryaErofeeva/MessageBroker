@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonRootName;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@JsonRootName("message")
+@JsonRootName("consumer")
 @Data
 @NoArgsConstructor
-public class MessageRequest {
-    private String content;
+public class ConsumerRequest {
+    private String port;
+    private String queue;
+    private String topic;
 }

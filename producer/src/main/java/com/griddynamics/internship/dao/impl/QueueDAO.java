@@ -30,11 +30,11 @@ public class QueueDAO implements SourceDAO<Queue> {
     @Override
     public List<Queue> getAll() {
         return jdbcTemplate.query("SELECT QUEUES.ID, QUEUES.NAME," +
-                " CONSUMERS.ID, CONSUMERS.NAME, " +
+                " CONSUMERS.ID, CONSUMERS.PORT, " +
                 " QUEUES_MESSAGES.ID, QUEUES_MESSAGES.CONTENT, QUEUES_MESSAGES.STATE, QUEUES_MESSAGES.TIMESTAMP " +
                 "FROM QUEUES " +
                 "  LEFT JOIN QUEUES_CONSUMERS ON QUEUES.ID = QUEUES_CONSUMERS.QUEUE_ID " +
-                "  JOIN CONSUMERS ON QUEUES_CONSUMERS.CONSUMER_ID = CONSUMERS.ID " +
+                "  LEFT JOIN CONSUMERS ON QUEUES_CONSUMERS.CONSUMER_ID = CONSUMERS.ID " +
                 "  LEFT JOIN QUEUES_MESSAGES on QUEUES.ID = QUEUES_MESSAGES.QUEUE_ID", queueExtractor);
     }
 
@@ -47,11 +47,11 @@ public class QueueDAO implements SourceDAO<Queue> {
     @Override
     public Queue getEntityById(Integer id) {
         return jdbcTemplate.query("SELECT QUEUES.ID, QUEUES.NAME," +
-                        " CONSUMERS.ID, CONSUMERS.NAME, " +
+                        " CONSUMERS.ID, CONSUMERS.PORT, " +
                         " QUEUES_MESSAGES.ID,  QUEUES_MESSAGES.CONTENT, QUEUES_MESSAGES.STATE, QUEUES_MESSAGES.TIMESTAMP " +
                         "FROM QUEUES " +
                         "  LEFT JOIN QUEUES_CONSUMERS ON QUEUES.ID = QUEUES_CONSUMERS.QUEUE_ID " +
-                        "  JOIN CONSUMERS ON QUEUES_CONSUMERS.CONSUMER_ID = CONSUMERS.ID " +
+                        "  LEFT JOIN CONSUMERS ON QUEUES_CONSUMERS.CONSUMER_ID = CONSUMERS.ID " +
                         "  LEFT JOIN QUEUES_MESSAGES on QUEUES.ID = QUEUES_MESSAGES.QUEUE_ID " +
                         "WHERE QUEUES.ID = ?",
                 new Object[]{id}, queueExtractor).get(0);
@@ -81,11 +81,11 @@ public class QueueDAO implements SourceDAO<Queue> {
     @Override
     public Queue getEntityByName(String name) {
         return jdbcTemplate.query("SELECT QUEUES.ID, QUEUES.NAME," +
-                        " CONSUMERS.ID, CONSUMERS.NAME, " +
+                        " CONSUMERS.ID, CONSUMERS.PORT, " +
                         " QUEUES_MESSAGES.ID,  QUEUES_MESSAGES.CONTENT, QUEUES_MESSAGES.STATE, QUEUES_MESSAGES.TIMESTAMP " +
                         "FROM QUEUES " +
                         "  LEFT JOIN QUEUES_CONSUMERS ON QUEUES.ID = QUEUES_CONSUMERS.QUEUE_ID " +
-                        "  JOIN CONSUMERS ON QUEUES_CONSUMERS.CONSUMER_ID = CONSUMERS.ID " +
+                        "  LEFT JOIN CONSUMERS ON QUEUES_CONSUMERS.CONSUMER_ID = CONSUMERS.ID " +
                         "  LEFT JOIN QUEUES_MESSAGES on QUEUES.ID = QUEUES_MESSAGES.QUEUE_ID " +
                         "WHERE QUEUES.NAME = ?",
                 new Object[]{name}, queueExtractor).get(0);
@@ -107,6 +107,12 @@ public class QueueDAO implements SourceDAO<Queue> {
     }
 
     @Override
+    public int updateMessageState(Message message) {
+        return jdbcTemplate.update("UPDATE QUEUES_MESSAGES SET STATE = ? WHERE ID = ?",
+                message.getState(), message.getId());
+    }
+
+    @Override
     public int addConsumer(Queue entity, Consumer consumer) {
         GeneratedKeyHolder holder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
@@ -123,5 +129,17 @@ public class QueueDAO implements SourceDAO<Queue> {
         return jdbcTemplate.queryForObject("SELECT * FROM QUEUES_MESSAGES " +
                         "WHERE QUEUE_ID = (SELECT ID FROM QUEUES WHERE NAME = ?) AND ID = ?",
                 new Object[]{entityName, messageId}, messageMapper);
+    }
+
+    public List<Queue> getAllFailed() {
+        return jdbcTemplate.query("SELECT QUEUES.ID, QUEUES.NAME," +
+                " CONSUMERS.ID, CONSUMERS.PORT, " +
+                " QUEUES_MESSAGES.ID, QUEUES_MESSAGES.CONTENT, QUEUES_MESSAGES.STATE, QUEUES_MESSAGES.TIMESTAMP " +
+                "FROM QUEUES " +
+                "  LEFT JOIN QUEUES_CONSUMERS ON QUEUES.ID = QUEUES_CONSUMERS.QUEUE_ID " +
+                "  LEFT JOIN CONSUMERS ON QUEUES_CONSUMERS.CONSUMER_ID = CONSUMERS.ID " +
+                "  LEFT JOIN QUEUES_MESSAGES on QUEUES.ID = QUEUES_MESSAGES.QUEUE_ID" +
+                " WHERE QUEUES_MESSAGES.STATE = 'failed'" +
+                "AND TIMESTAMPDIFF(HOUR, QUEUES_MESSAGES.TIMESTAMP, TIMESTAMPADD(HOUR, 3, NOW())) < 5", queueExtractor);
     }
 }

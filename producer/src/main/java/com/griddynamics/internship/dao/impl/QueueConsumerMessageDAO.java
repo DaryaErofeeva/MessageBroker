@@ -2,6 +2,7 @@ package com.griddynamics.internship.dao.impl;
 
 import com.griddynamics.internship.dao.GenericDAO;
 import com.griddynamics.internship.dao.row.mappers.QueueConsumerMessageMapper;
+import com.griddynamics.internship.models.entities.Consumer;
 import com.griddynamics.internship.models.entities.SourceConsumerMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -77,5 +78,13 @@ public class QueueConsumerMessageDAO implements GenericDAO<SourceConsumerMessage
         }, holder);
         entity.setId(holder.getKey().intValue());
         return holder.getKey().intValue();
+    }
+
+    public int getLastConsumerId(int queueId) {
+        return jdbcTemplate.queryForObject("SELECT CONSUMER_ID " +
+                        "FROM QUEUES_CONSUMERS_MESSAGES " +
+                        "  JOIN QUEUES_CONSUMERS on QUEUES_CONSUMERS_MESSAGES.QUEUE_CONSUMER_ID = QUEUES_CONSUMERS.ID " +
+                        "WHERE QUEUES_CONSUMERS_MESSAGES.ID = (SELECT MAX(ID) FROM QUEUES_CONSUMERS_MESSAGES WHERE QUEUE_ID = ?)",
+                new Object[]{queueId}, Integer.class);
     }
 }
