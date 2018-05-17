@@ -14,7 +14,7 @@ public class ConsumerMapper implements RowMapper<Consumer> {
     public Consumer mapRow(ResultSet resultSet, int i) throws SQLException {
         Consumer consumer = new Consumer();
         consumer.setId(resultSet.getInt(1));
-        consumer.setName(resultSet.getString(2));
+        consumer.setPort(resultSet.getString(2));
         return consumer;
     }
 }

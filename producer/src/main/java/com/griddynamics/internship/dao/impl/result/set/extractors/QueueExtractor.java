@@ -34,11 +34,11 @@ public class QueueExtractor implements ResultSetExtractor<List<Queue>> {
             }
 
             int consumerId = resultSet.getInt(3);
-            if (consumerId != 0)
+            if (consumerId != 0 && !queue.getConsumers().stream().anyMatch(consumer -> consumer.getId() == consumerId))
                 queue.getConsumers().add(new Consumer(consumerId, resultSet.getString(4)));
 
             int messageId = resultSet.getInt(5);
-            if (messageId != 0)
+            if (messageId != 0 && !queue.getMessages().stream().anyMatch(message -> message.getId() == messageId))
                 queue.getMessages().add(new Message(messageId,
                         resultSet.getString(6),
                         resultSet.getString(7),

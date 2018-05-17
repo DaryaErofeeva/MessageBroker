@@ -30,11 +30,11 @@ public class TopicDAO implements SourceDAO<Topic> {
     @Override
     public List<Topic> getAll() {
         return jdbcTemplate.query("SELECT TOPICS.ID, TOPICS.NAME," +
-                " CONSUMERS.ID, CONSUMERS.NAME, " +
+                " CONSUMERS.ID, CONSUMERS.PORT, " +
                 " TOPICS_MESSAGES.ID,  TOPICS_MESSAGES.CONTENT, TOPICS_MESSAGES.STATE, TOPICS_MESSAGES.TIMESTAMP " +
                 "FROM TOPICS " +
                 "  LEFT JOIN TOPICS_CONSUMERS ON TOPICS.ID = TOPICS_CONSUMERS.TOPIC_ID " +
-                "  JOIN CONSUMERS ON TOPICS_CONSUMERS.CONSUMER_ID = CONSUMERS.ID " +
+                "  LEFT JOIN CONSUMERS ON TOPICS_CONSUMERS.CONSUMER_ID = CONSUMERS.ID " +
                 "  LEFT JOIN TOPICS_MESSAGES on TOPICS.ID = TOPICS_MESSAGES.TOPIC_ID", topicExtractor);
     }
 
@@ -47,11 +47,11 @@ public class TopicDAO implements SourceDAO<Topic> {
     @Override
     public Topic getEntityById(Integer id) {
         return jdbcTemplate.query("SELECT TOPICS.ID, TOPICS.NAME," +
-                        " CONSUMERS.ID, CONSUMERS.NAME, " +
+                        " CONSUMERS.ID, CONSUMERS.PORT, " +
                         " TOPICS_MESSAGES.ID,  TOPICS_MESSAGES.CONTENT, TOPICS_MESSAGES.STATE, TOPICS_MESSAGES.TIMESTAMP " +
                         "FROM TOPICS " +
                         "  LEFT JOIN TOPICS_CONSUMERS ON TOPICS.ID = TOPICS_CONSUMERS.TOPIC_ID " +
-                        "  JOIN CONSUMERS ON TOPICS_CONSUMERS.CONSUMER_ID = CONSUMERS.ID " +
+                        "  LEFT JOIN CONSUMERS ON TOPICS_CONSUMERS.CONSUMER_ID = CONSUMERS.ID " +
                         "  LEFT JOIN TOPICS_MESSAGES on TOPICS.ID = TOPICS_MESSAGES.TOPIC_ID " +
                         "WHERE TOPICS.ID = ?",
                 new Object[]{id}, topicExtractor).get(0);
@@ -81,11 +81,11 @@ public class TopicDAO implements SourceDAO<Topic> {
     @Override
     public Topic getEntityByName(String name) {
         return jdbcTemplate.query("SELECT TOPICS.ID, TOPICS.NAME," +
-                        " CONSUMERS.ID, CONSUMERS.NAME, " +
+                        " CONSUMERS.ID, CONSUMERS.PORT, " +
                         " TOPICS_MESSAGES.ID,  TOPICS_MESSAGES.CONTENT, TOPICS_MESSAGES.STATE, TOPICS_MESSAGES.TIMESTAMP " +
                         "FROM TOPICS " +
                         "  LEFT JOIN TOPICS_CONSUMERS ON TOPICS.ID = TOPICS_CONSUMERS.TOPIC_ID " +
-                        "  JOIN CONSUMERS ON TOPICS_CONSUMERS.CONSUMER_ID = CONSUMERS.ID " +
+                        "  LEFT JOIN CONSUMERS ON TOPICS_CONSUMERS.CONSUMER_ID = CONSUMERS.ID " +
                         "  LEFT JOIN TOPICS_MESSAGES on TOPICS.ID = TOPICS_MESSAGES.TOPIC_ID " +
                         "WHERE TOPICS.NAME = ?",
                 new Object[]{name}, topicExtractor).get(0);
@@ -107,6 +107,12 @@ public class TopicDAO implements SourceDAO<Topic> {
     }
 
     @Override
+    public int updateMessageState(Message message) {
+        return jdbcTemplate.update("UPDATE TOPICS_MESSAGES SET STATE = ? WHERE ID = ?",
+                message.getState(), message.getId());
+    }
+
+    @Override
     public int addConsumer(Topic entity, Consumer consumer) {
         GeneratedKeyHolder holder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
@@ -123,5 +129,17 @@ public class TopicDAO implements SourceDAO<Topic> {
         return jdbcTemplate.queryForObject("SELECT * FROM TOPICS_MESSAGES " +
                         "WHERE TOPIC_ID = (SELECT ID FROM TOPICS WHERE NAME = ?) AND ID = ?",
                 new Object[]{entityName, messageId}, messageMapper);
+    }
+
+    public List<Topic> getAllFailed(){
+        return jdbcTemplate.query("SELECT TOPICS.ID, TOPICS.NAME," +
+                " CONSUMERS.ID, CONSUMERS.PORT, " +
+                " TOPICS_MESSAGES.ID, TOPICS_MESSAGES.CONTENT, TOPICS_MESSAGES.STATE, TOPICS_MESSAGES.TIMESTAMP " +
+                "FROM TOPICS " +
+                "  LEFT JOIN TOPICS_CONSUMERS ON TOPICS.ID = TOPICS_CONSUMERS.TOPIC_ID " +
+                "  LEFT JOIN CONSUMERS ON TOPICS_CONSUMERS.CONSUMER_ID = CONSUMERS.ID " +
+                "  LEFT JOIN TOPICS_MESSAGES on TOPICS.ID = TOPICS_MESSAGES.TOPIC_ID" +
+                " WHERE TOPICS_MESSAGES.STATE = 'failed'"+
+                "AND TIMESTAMPDIFF(HOUR, TOPICS_MESSAGES.TIMESTAMP, TIMESTAMPADD(HOUR, 3, NOW())) < 5", topicExtractor);
     }
 }
