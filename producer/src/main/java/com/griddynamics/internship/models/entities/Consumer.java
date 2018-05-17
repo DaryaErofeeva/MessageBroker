@@ -10,5 +10,5 @@ public class Consumer {
     private int id;
 
     @NonNull
-    private String name;
+    private String port;
 }

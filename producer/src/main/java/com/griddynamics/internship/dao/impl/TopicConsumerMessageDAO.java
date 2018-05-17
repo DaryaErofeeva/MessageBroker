@@ -78,4 +78,18 @@ public class TopicConsumerMessageDAO implements GenericDAO<SourceConsumerMessage
         entity.setId(holder.getKey().intValue());
         return holder.getKey().intValue();
     }
+
+    public List<SourceConsumerMessage> getFailed() {
+        return jdbcTemplate.query("SELECT TOPICS_CONSUMERS_MESSAGES.ID, TOPICS_CONSUMERS_MESSAGES.STATE, TOPICS_CONSUMERS_MESSAGES.TIMESTAMP," +
+                "  TOPICS.ID," +
+                "  CONSUMERS.ID," +
+                "  TOPICS_MESSAGES.ID, TOPICS_MESSAGES.CONTENT, TOPICS_MESSAGES.STATE, TOPICS_MESSAGES.TIMESTAMP" +
+                " FROM TOPICS_CONSUMERS_MESSAGES" +
+                "  JOIN TOPICS_CONSUMERS ON TOPICS_CONSUMERS_MESSAGES.TOPIC_CONSUMER_ID = TOPICS_CONSUMERS.ID" +
+                "  JOIN TOPICS ON TOPICS_CONSUMERS.TOPIC_ID = TOPICS.ID" +
+                "  JOIN CONSUMERS ON TOPICS_CONSUMERS.CONSUMER_ID = CONSUMERS.ID" +
+                "  JOIN TOPICS_MESSAGES on TOPICS.ID = TOPICS_MESSAGES.TOPIC_ID" +
+                " WHERE TOPICS_CONSUMERS_MESSAGES.STATE = 'failed'" +
+                "AND TIMESTAMPDIFF(HOUR, TOPICS_CONSUMERS_MESSAGES.TIMESTAMP, TIMESTAMPADD(HOUR, 3, NOW())) < 5", topicConsumerMessageMapper);
+    }
 }

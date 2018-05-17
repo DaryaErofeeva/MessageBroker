@@ -8,6 +8,8 @@ public interface SourceDAO<E extends Source> extends GenericDAO<E, Integer> {
 
     int createMessage(E entity, Message message);
 
+    int updateMessageState(Message message);
+
     int addConsumer(E entity, Consumer consumer);
 
     E getEntityByName(String name);
