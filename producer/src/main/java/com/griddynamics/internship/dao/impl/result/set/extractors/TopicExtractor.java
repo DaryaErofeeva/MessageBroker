@@ -35,14 +35,14 @@ public class TopicExtractor implements ResultSetExtractor<List<Topic>> {
 
             int consumerId = resultSet.getInt(3);
             if (consumerId != 0 && !topic.getConsumers().stream().anyMatch(consumer -> consumer.getId() == consumerId))
-                topic.getConsumers().add(new Consumer(consumerId, resultSet.getString(4)));
+                topic.getConsumers().add(new Consumer(consumerId, resultSet.getString(4), resultSet.getString(5)));
 
-            int messageId = resultSet.getInt(5);
+            int messageId = resultSet.getInt(6);
             if (messageId != 0 && !topic.getMessages().stream().anyMatch(message -> message.getId() == messageId))
                 topic.getMessages().add(new Message(messageId,
-                        resultSet.getString(6),
                         resultSet.getString(7),
-                        resultSet.getTimestamp(8)));
+                        resultSet.getString(8),
+                        resultSet.getTimestamp(9)));
         }
         return new ArrayList<>(map.values());
     }

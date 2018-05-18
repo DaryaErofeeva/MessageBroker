@@ -10,5 +10,8 @@ public class Consumer {
     private int id;
 
     @NonNull
+    private String host;
+
+    @NonNull
     private String port;
 }

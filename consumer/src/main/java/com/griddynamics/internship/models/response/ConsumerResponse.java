@@ -1,4 +1,4 @@
-package com.griddynamics.internship;
+package com.griddynamics.internship.models.response;
 
 import lombok.Data;
 import org.springframework.stereotype.Component;
@@ -7,5 +7,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ConsumerResponse {
     private int id;
+    private String host;
     private String port;
 }

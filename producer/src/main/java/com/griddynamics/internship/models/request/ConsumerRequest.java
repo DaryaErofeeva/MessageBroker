@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class ConsumerRequest {
+    private String host;
     private String port;
     private String queue;
     private String topic;
