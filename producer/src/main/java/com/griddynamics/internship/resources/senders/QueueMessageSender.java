@@ -37,7 +37,7 @@ public class QueueMessageSender {
             Consumer consumer = queue.getConsumers().get(getConsumerIndex(queue) % queue.getConsumers().size());
 
             try {
-                new RestTemplate().put("http://localhost:" + consumer.getPort() + "/consumer/v1/message", message, ResponseMessage.class);
+                new RestTemplate().put("http://" + consumer.getHost() + ":" + consumer.getPort() + "/consumer/v1/message", message, ResponseMessage.class);
                 daoFactory.getQueueConsumerMessageDAO().create(
                         new SourceConsumerMessage("delivered", new Timestamp(System.currentTimeMillis()), queue, consumer, message));
                 return true;

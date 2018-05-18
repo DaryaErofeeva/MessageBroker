@@ -27,7 +27,7 @@ public class ConsumerDAO implements GenericDAO<Consumer, Integer> {
 
     @Override
     public int update(Consumer entity) {
-        return jdbcTemplate.update("UPDATE CONSUMERS SET PORT = ? WHERE ID = ?",
+        return jdbcTemplate.update("UPDATE CONSUMERS SET HOST = ?, PORT = ? WHERE ID = ?",
                 entity.getPort(), entity.getId());
     }
 
@@ -46,8 +46,9 @@ public class ConsumerDAO implements GenericDAO<Consumer, Integer> {
     public int create(Consumer entity) {
         GeneratedKeyHolder holder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO CONSUMERS (PORT) VALUES (?)", Statement.RETURN_GENERATED_KEYS);
-            statement.setString(1, entity.getPort());
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO CONSUMERS (HOST, PORT) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1, entity.getHost());
+            statement.setString(2, entity.getPort());
             return statement;
         }, holder);
         entity.setId(holder.getKey().intValue());
