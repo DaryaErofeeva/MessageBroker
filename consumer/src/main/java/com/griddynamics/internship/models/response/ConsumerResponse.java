@@ -7,5 +7,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ConsumerResponse {
     private int id;
+    private String host;
     private String port;
 }

@@ -9,6 +9,10 @@ import org.springframework.stereotype.Component;
 @Data
 @JsonRootName("consumer")
 public class ConsumerRequest {
+
+    @Value("${server.host}")
+    private String host;
+
     @Value("${server.port}")
     private String port;
 

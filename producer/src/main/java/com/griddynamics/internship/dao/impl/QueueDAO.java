@@ -30,7 +30,7 @@ public class QueueDAO implements SourceDAO<Queue> {
     @Override
     public List<Queue> getAll() {
         return jdbcTemplate.query("SELECT QUEUES.ID, QUEUES.NAME," +
-                " CONSUMERS.ID, CONSUMERS.PORT, " +
+                " CONSUMERS.ID, CONSUMERS.HOST, CONSUMERS.PORT, " +
                 " QUEUES_MESSAGES.ID, QUEUES_MESSAGES.CONTENT, QUEUES_MESSAGES.STATE, QUEUES_MESSAGES.TIMESTAMP " +
                 "FROM QUEUES " +
                 "  LEFT JOIN QUEUES_CONSUMERS ON QUEUES.ID = QUEUES_CONSUMERS.QUEUE_ID " +
@@ -47,7 +47,7 @@ public class QueueDAO implements SourceDAO<Queue> {
     @Override
     public Queue getEntityById(Integer id) {
         return jdbcTemplate.query("SELECT QUEUES.ID, QUEUES.NAME," +
-                        " CONSUMERS.ID, CONSUMERS.PORT, " +
+                        " CONSUMERS.ID, CONSUMERS.HOST, CONSUMERS.PORT, " +
                         " QUEUES_MESSAGES.ID,  QUEUES_MESSAGES.CONTENT, QUEUES_MESSAGES.STATE, QUEUES_MESSAGES.TIMESTAMP " +
                         "FROM QUEUES " +
                         "  LEFT JOIN QUEUES_CONSUMERS ON QUEUES.ID = QUEUES_CONSUMERS.QUEUE_ID " +
@@ -81,7 +81,7 @@ public class QueueDAO implements SourceDAO<Queue> {
     @Override
     public Queue getEntityByName(String name) {
         return jdbcTemplate.query("SELECT QUEUES.ID, QUEUES.NAME," +
-                        " CONSUMERS.ID, CONSUMERS.PORT, " +
+                        " CONSUMERS.ID, CONSUMERS.HOST, CONSUMERS.PORT, " +
                         " QUEUES_MESSAGES.ID,  QUEUES_MESSAGES.CONTENT, QUEUES_MESSAGES.STATE, QUEUES_MESSAGES.TIMESTAMP " +
                         "FROM QUEUES " +
                         "  LEFT JOIN QUEUES_CONSUMERS ON QUEUES.ID = QUEUES_CONSUMERS.QUEUE_ID " +
@@ -133,7 +133,7 @@ public class QueueDAO implements SourceDAO<Queue> {
 
     public List<Queue> getAllFailed() {
         return jdbcTemplate.query("SELECT QUEUES.ID, QUEUES.NAME," +
-                " CONSUMERS.ID, CONSUMERS.PORT, " +
+                " CONSUMERS.ID, CONSUMERS.HOST, CONSUMERS.PORT, " +
                 " QUEUES_MESSAGES.ID, QUEUES_MESSAGES.CONTENT, QUEUES_MESSAGES.STATE, QUEUES_MESSAGES.TIMESTAMP " +
                 "FROM QUEUES " +
                 "  LEFT JOIN QUEUES_CONSUMERS ON QUEUES.ID = QUEUES_CONSUMERS.QUEUE_ID " +

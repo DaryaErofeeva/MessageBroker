@@ -30,7 +30,7 @@ public class TopicDAO implements SourceDAO<Topic> {
     @Override
     public List<Topic> getAll() {
         return jdbcTemplate.query("SELECT TOPICS.ID, TOPICS.NAME," +
-                " CONSUMERS.ID, CONSUMERS.PORT, " +
+                " CONSUMERS.ID, CONSUMERS.HOST, CONSUMERS.PORT, " +
                 " TOPICS_MESSAGES.ID,  TOPICS_MESSAGES.CONTENT, TOPICS_MESSAGES.STATE, TOPICS_MESSAGES.TIMESTAMP " +
                 "FROM TOPICS " +
                 "  LEFT JOIN TOPICS_CONSUMERS ON TOPICS.ID = TOPICS_CONSUMERS.TOPIC_ID " +
@@ -47,7 +47,7 @@ public class TopicDAO implements SourceDAO<Topic> {
     @Override
     public Topic getEntityById(Integer id) {
         return jdbcTemplate.query("SELECT TOPICS.ID, TOPICS.NAME," +
-                        " CONSUMERS.ID, CONSUMERS.PORT, " +
+                        " CONSUMERS.ID, CONSUMERS.HOST, CONSUMERS.PORT, " +
                         " TOPICS_MESSAGES.ID,  TOPICS_MESSAGES.CONTENT, TOPICS_MESSAGES.STATE, TOPICS_MESSAGES.TIMESTAMP " +
                         "FROM TOPICS " +
                         "  LEFT JOIN TOPICS_CONSUMERS ON TOPICS.ID = TOPICS_CONSUMERS.TOPIC_ID " +
@@ -81,7 +81,7 @@ public class TopicDAO implements SourceDAO<Topic> {
     @Override
     public Topic getEntityByName(String name) {
         return jdbcTemplate.query("SELECT TOPICS.ID, TOPICS.NAME," +
-                        " CONSUMERS.ID, CONSUMERS.PORT, " +
+                        " CONSUMERS.ID, CONSUMERS.HOST, CONSUMERS.PORT, " +
                         " TOPICS_MESSAGES.ID,  TOPICS_MESSAGES.CONTENT, TOPICS_MESSAGES.STATE, TOPICS_MESSAGES.TIMESTAMP " +
                         "FROM TOPICS " +
                         "  LEFT JOIN TOPICS_CONSUMERS ON TOPICS.ID = TOPICS_CONSUMERS.TOPIC_ID " +
@@ -133,7 +133,7 @@ public class TopicDAO implements SourceDAO<Topic> {
 
     public List<Topic> getAllFailed(){
         return jdbcTemplate.query("SELECT TOPICS.ID, TOPICS.NAME," +
-                " CONSUMERS.ID, CONSUMERS.PORT, " +
+                " CONSUMERS.ID, CONSUMERS.HOST, CONSUMERS.PORT, " +
                 " TOPICS_MESSAGES.ID, TOPICS_MESSAGES.CONTENT, TOPICS_MESSAGES.STATE, TOPICS_MESSAGES.TIMESTAMP " +
                 "FROM TOPICS " +
                 "  LEFT JOIN TOPICS_CONSUMERS ON TOPICS.ID = TOPICS_CONSUMERS.TOPIC_ID " +

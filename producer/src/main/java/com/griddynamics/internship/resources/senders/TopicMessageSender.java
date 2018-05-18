@@ -45,7 +45,7 @@ public class TopicMessageSender {
 
     public boolean sendMessage(Consumer consumer, Message message) {
         try {
-            new RestTemplate().put("http://localhost:" + consumer.getPort() + "/consumer/v1/message", message, ResponseMessage.class);
+            new RestTemplate().put("http://"+consumer.getHost()+ ":" + consumer.getPort() + "/consumer/v1/message", message, ResponseMessage.class);
             return true;
         } catch (ResourceAccessException ex) {
             return false;
