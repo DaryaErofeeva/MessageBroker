@@ -1,5 +1,7 @@
-package com.griddynamics.internship;
+package com.griddynamics.internship.resources;
 
+import com.griddynamics.internship.models.request.MessageRequest;
+import com.griddynamics.internship.models.response.ResponseMessage;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 

@@ -1,5 +1,6 @@
 package com.griddynamics.internship;
 
+import com.griddynamics.internship.models.response.ConsumerResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;

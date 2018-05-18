@@ -1,4 +1,4 @@
-package com.griddynamics.internship;
+package com.griddynamics.internship.models.response;
 
 import lombok.Data;
 import org.springframework.stereotype.Component;

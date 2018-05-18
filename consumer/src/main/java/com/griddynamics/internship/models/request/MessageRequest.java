@@ -1,4 +1,4 @@
-package com.griddynamics.internship;
+package com.griddynamics.internship.models.request;
 
 
 import com.fasterxml.jackson.annotation.JsonRootName;

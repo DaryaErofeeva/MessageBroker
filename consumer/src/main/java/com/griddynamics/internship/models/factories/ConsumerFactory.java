@@ -1,5 +1,7 @@
-package com.griddynamics.internship;
+package com.griddynamics.internship.models.factories;
 
+import com.griddynamics.internship.models.request.ConsumerRequest;
+import com.griddynamics.internship.models.response.ConsumerResponse;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +15,6 @@ public class ConsumerFactory implements FactoryBean<ConsumerResponse> {
     @Autowired
     private ConsumerRequest consumerRequest;
 
-    @Bean("consumerResponse")
     @Override
     public ConsumerResponse getObject() throws Exception {
         return new RestTemplate()
