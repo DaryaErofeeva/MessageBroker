@@ -1,5 +1,6 @@
 package com.griddynamics.internship.resources;
 
+import com.griddynamics.internship.ClockService;
 import com.griddynamics.internship.dao.DAOFactory;
 import com.griddynamics.internship.resources.senders.TopicMessageSender;
 import com.griddynamics.internship.models.entities.Message;
@@ -35,6 +36,9 @@ public class TopicResources {
 
     @Autowired
     private TopicMessageSender topicMessageSender;
+
+    @Autowired
+    private ClockService clockService;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON_VALUE)
@@ -81,7 +85,7 @@ public class TopicResources {
         try {
             Message message = messageModelMapper.convertToEntity(messageRequest);
             message.setState("put");
-            message.setTimestamp(new Timestamp(System.currentTimeMillis()));
+            message.setTimestamp(clockService.now());
 
             Topic topic = daoFactory.getTopicDAO().getEntityByName(name);
             daoFactory.getTopicDAO().createMessage(topic, message);
