@@ -1,7 +1,7 @@
 package com.griddynamics.internship.resources;
 
+import com.griddynamics.internship.ClockService;
 import com.griddynamics.internship.dao.DAOFactory;
-import com.griddynamics.internship.resources.senders.QueueMessageSender;
 import com.griddynamics.internship.models.entities.Message;
 import com.griddynamics.internship.models.entities.Queue;
 import com.griddynamics.internship.models.request.MessageRequest;
@@ -9,6 +9,7 @@ import com.griddynamics.internship.models.response.ResponseMessage;
 import com.griddynamics.internship.models.response.plural.QueuesResponse;
 import com.griddynamics.internship.resources.model.mappers.MessageModelMapper;
 import com.griddynamics.internship.resources.model.mappers.QueueModelMapper;
+import com.griddynamics.internship.resources.senders.QueueMessageSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.MediaType;
@@ -18,7 +19,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 
 @Controller
@@ -36,6 +36,9 @@ public class QueueResource {
 
     @Autowired
     private QueueMessageSender queueMessageSender;
+
+    @Autowired
+    private ClockService clockService;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON_VALUE)
@@ -77,17 +80,17 @@ public class QueueResource {
     public Response createMessage(@PathParam("name") String name, MessageRequest messageRequest) throws URISyntaxException {
 
         if (messageRequest.getContent() == null)
-            return Response.status(400).entity(new Object[]{new ResponseMessage("Wrong input message format"), new MessageRequest()}).build();
+            return Response.status(400).entity(new ResponseMessage("Wrong input message format")).build();
 
         try {
             Message message = messageModelMapper.convertToEntity(messageRequest);
             message.setState("put");
-            message.setTimestamp(new Timestamp(System.currentTimeMillis()));
+            message.setTimestamp(clockService.now());
 
             Queue queue = daoFactory.getQueueDAO().getEntityByName(name);
             daoFactory.getQueueDAO().createMessage(queue, message);
 
-            if (queue.getConsumers().size() > 0)
+            if (queue.getConsumers() != null && queue.getConsumers().size() > 0)
                 queueMessageSender.sendMessage(queue, message);
 
             return Response
