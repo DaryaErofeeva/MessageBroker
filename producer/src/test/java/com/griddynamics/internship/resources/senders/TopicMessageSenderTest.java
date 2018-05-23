@@ -21,6 +21,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import java.sql.Timestamp;
@@ -28,8 +29,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @RunWith(Parameterized.class)
@@ -62,22 +62,28 @@ public class TopicMessageSenderTest {
     @Parameterized.Parameters
     public static Collection<Object[]> dataFirst() {
         return Arrays.asList(new Object[][]{
-                {new Consumer("host1", "port1"), new Message(),
-                        new Topic(), new Consumer[]{new Consumer("host1", "port1"), new Consumer("host2", "port2")}}
+                {new Consumer("host1", "port1"), new Message(), "delivered",
+                        new Topic(), new Consumer[]{new Consumer("host1", "port1"), new Consumer("host2", "port2")}},
+                {new Consumer("host1", "port1"), new Message(), "failed",
+                        new Topic(), new Consumer[]{}}
         });
     }
 
     private Consumer consumer;
     private Message message;
-
+    private Message expectedMessage;
     private Topic topic;
+    private String expectedState;
 
-    public TopicMessageSenderTest(Consumer consumer, Message message, Topic topic, Consumer... consumers) {
+    public TopicMessageSenderTest(Consumer consumer, Message message, String expectedState, Topic topic, Consumer... consumers) {
         this.consumer = consumer;
         this.message = message;
+        this.expectedState = expectedState;
 
         this.topic = topic;
         this.topic.setConsumers(Arrays.asList(consumers));
+
+        this.expectedMessage = new Message();
     }
 
     @Before
@@ -85,6 +91,8 @@ public class TopicMessageSenderTest {
         MockitoAnnotations.initMocks(this);
         given(restTemplateBuilder.build()).willReturn(restTemplate);
         given(clockService.now()).willReturn(new Timestamp(System.currentTimeMillis()));
+
+        this.message.setState("put");
     }
 
     @Test
@@ -107,7 +115,20 @@ public class TopicMessageSenderTest {
                     .create(new SourceConsumerMessage("delivered", clockService.now(), topic, topicConsumer, message));
         });
 
-        message.setState("delivered");
-        verify(topicDAO, times(1)).updateMessageState(message);
+        expectedMessage.setState(expectedState);
+        verify(topicDAO, times(1)).updateMessageState(expectedMessage);
+    }
+
+    @Test
+    public void sendMessageToConsumers_ResourceAccessException() {
+        topic.getConsumers().forEach(topicConsumer ->
+                doThrow(new ResourceAccessException(""))
+                        .when(restTemplate)
+                        .put("http://" + topicConsumer.getHost() + ":" + topicConsumer.getPort() + "/consumer/v1/message", message, ResponseMessage.class));
+
+        topicMessageSender.sendMessage(topic, message);
+
+        expectedMessage.setState("failed");
+        verify(topicDAO, times(1)).updateMessageState(expectedMessage);
     }
 }

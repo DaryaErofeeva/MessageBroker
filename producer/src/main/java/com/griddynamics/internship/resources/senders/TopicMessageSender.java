@@ -38,13 +38,12 @@ public class TopicMessageSender {
         for (Consumer consumer : topic.getConsumers()) {
             if (sendMessage(consumer, message)) {
                 consumerMessages.add(new SourceConsumerMessage("delivered", clockService.now(), topic, consumer, message));
-                //TODO
                 message.setState("delivered");
             } else
                 consumerMessages.add(new SourceConsumerMessage("failed", clockService.now(), topic, consumer, message));
         }
 
-        if (message.getState().equals("put"))
+        if (!message.getState().equals("delivered"))
             message.setState("failed");
 
         if (message.getState().equals("delivered"))
