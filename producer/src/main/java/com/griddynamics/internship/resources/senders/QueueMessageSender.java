@@ -7,18 +7,30 @@ import com.griddynamics.internship.models.entities.Queue;
 import com.griddynamics.internship.models.entities.SourceConsumerMessage;
 import com.griddynamics.internship.models.response.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import java.sql.Timestamp;
 
-@Component
+@Service
 public class QueueMessageSender {
 
     @Autowired
     private DAOFactory daoFactory;
+
+    private RestTemplate restTemplate;
+
+    public QueueMessageSender(RestTemplateBuilder restTemplateBuilder) {
+        this.restTemplate = restTemplateBuilder.build();
+    }
+
+    public RestTemplate getRestTemplate() {
+        return restTemplate;
+    }
 
     public void sendMessage(Queue queue, Message message) {
 
@@ -28,7 +40,6 @@ public class QueueMessageSender {
         daoFactory.getQueueDAO().updateMessageState(message);
     }
 
-
     private boolean getConsumer(Queue queue, Message message) {
         int count = 0;
 
@@ -37,7 +48,7 @@ public class QueueMessageSender {
             Consumer consumer = queue.getConsumers().get(getConsumerIndex(queue) % queue.getConsumers().size());
 
             try {
-                new RestTemplate().put("http://" + consumer.getHost() + ":" + consumer.getPort() + "/consumer/v1/message", message, ResponseMessage.class);
+                restTemplate.put("http://" + consumer.getHost() + ":" + consumer.getPort() + "/consumer/v1/message", message, ResponseMessage.class);
                 daoFactory.getQueueConsumerMessageDAO().create(
                         new SourceConsumerMessage("delivered", new Timestamp(System.currentTimeMillis()), queue, consumer, message));
                 return true;
@@ -53,8 +64,8 @@ public class QueueMessageSender {
 
     private int getConsumerIndex(Queue queue) {
         try {
-            int lastConsumerId = daoFactory.getQueueConsumerMessageDAO().getLastConsumerId(queue.getId());
-            return queue.getConsumers().indexOf(daoFactory.getConsumerDAO().getEntityById(lastConsumerId)) + 1;
+            return queue.getConsumers().indexOf(daoFactory.getConsumerDAO()
+                    .getEntityById(daoFactory.getQueueConsumerMessageDAO().getLastConsumerId(queue.getId()))) + 1;
 
         } catch (EmptyResultDataAccessException ex) {
             return queue.getConsumers().size();
