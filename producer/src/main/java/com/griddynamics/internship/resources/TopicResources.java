@@ -80,7 +80,7 @@ public class TopicResources {
     public Response createMessage(@PathParam("name") String name, MessageRequest messageRequest) throws URISyntaxException {
 
         if (messageRequest.getContent() == null)
-            return Response.status(400).entity(new Object[]{new ResponseMessage("Wrong input message format"), new MessageRequest()}).build();
+            return Response.status(400).entity(new ResponseMessage("Wrong input message format")).build();
 
         try {
             Message message = messageModelMapper.convertToEntity(messageRequest);
@@ -90,7 +90,7 @@ public class TopicResources {
             Topic topic = daoFactory.getTopicDAO().getEntityByName(name);
             daoFactory.getTopicDAO().createMessage(topic, message);
 
-            if (topic.getConsumers().size() > 0)
+            if (topic.getConsumers() != null && topic.getConsumers().size() > 0)
                 topicMessageSender.sendMessage(topic, message);
 
             return Response

@@ -4,13 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.griddynamics.internship.ClockService;
-import com.griddynamics.internship.dao.impl.QueueDAO;
+import com.griddynamics.internship.dao.impl.TopicDAO;
 import com.griddynamics.internship.models.entities.Message;
-import com.griddynamics.internship.models.entities.Queue;
+import com.griddynamics.internship.models.entities.Topic;
 import com.griddynamics.internship.models.request.MessageRequest;
 import com.griddynamics.internship.models.response.MessageResponse;
-import com.griddynamics.internship.models.response.QueueResponse;
 import com.griddynamics.internship.models.response.ResponseMessage;
+import com.griddynamics.internship.models.response.TopicResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,13 +37,12 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @RunWith(SpringRunner.class)
-public class QueueResourceTest {
-
+public class TopicResourceTest {
     @LocalServerPort
     private int port;
 
     @MockBean
-    private QueueDAO queueDAO;
+    private TopicDAO topicDAO;
 
     @MockBean
     private ClockService clockService;
@@ -54,7 +53,7 @@ public class QueueResourceTest {
 
     private ObjectMapper objectMapper;
 
-    public QueueResourceTest() {
+    public TopicResourceTest() {
         timestamp = new Timestamp(System.currentTimeMillis());
         objectMapper = new ObjectMapper();
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -70,41 +69,40 @@ public class QueueResourceTest {
     }
 
     @Test
-    public void getAllQueues() {
+    public void getAllTopics() {
 
-        given(queueDAO.getAll()).willReturn(new ArrayList<>());
+        given(topicDAO.getAll()).willReturn(new ArrayList<>());
 
-        Response output = webTarget.path("/broker/v1/producer/queue").request().get();
+        Response output = webTarget.path("/broker/v1/producer/topic").request().get();
         assertEquals(200, output.getStatus());
         assertEquals(MediaType.APPLICATION_JSON_TYPE, output.getMediaType());
     }
 
     @Test
-    public void getQueue() throws JsonProcessingException {
-        given(queueDAO.getEntityByName("queue")).willReturn(new Queue());
+    public void getTopic() throws JsonProcessingException {
+        given(topicDAO.getEntityByName("topic")).willReturn(new Topic());
 
-        Response output = webTarget.path("/broker/v1/producer/queue/queue").request().get();
+        Response output = webTarget.path("/broker/v1/producer/topic/topic").request().get();
         assertEquals(200, output.getStatus());
         assertEquals(MediaType.APPLICATION_JSON_TYPE, output.getMediaType());
-        assertEquals(objectMapper.writeValueAsString(new QueueResponse()), output.readEntity(String.class));
+        assertEquals(objectMapper.writeValueAsString(new TopicResponse()), output.readEntity(String.class));
     }
 
     @Test
-    public void getQueue_EmptyResultDataAccessException() throws JsonProcessingException {
+    public void getTopic_EmptyResultDataAccessException() throws JsonProcessingException {
+        when(topicDAO.getEntityByName("topic")).thenThrow(new EmptyResultDataAccessException(1));
 
-        when(queueDAO.getEntityByName("queue")).thenThrow(new EmptyResultDataAccessException(1));
-
-        Response output = webTarget.path("/broker/v1/producer/queue/queue").request().get();
+        Response output = webTarget.path("/broker/v1/producer/topic/topic").request().get();
         assertEquals(400, output.getStatus());
         assertEquals(MediaType.APPLICATION_JSON_TYPE, output.getMediaType());
-        assertEquals(objectMapper.writeValueAsString(new ResponseMessage("No queue with such name")), output.readEntity(String.class));
+        assertEquals(objectMapper.writeValueAsString(new ResponseMessage("No topic with such name")), output.readEntity(String.class));
     }
 
     @Test
     public void getMessage() throws JsonProcessingException {
-        given(queueDAO.getMessageByIdAndEntityName("queue", 1)).willReturn(new Message());
+        given(topicDAO.getMessageByIdAndEntityName("topic", 1)).willReturn(new Message());
 
-        Response output = webTarget.path("/broker/v1/producer/queue/queue/1").request().get();
+        Response output = webTarget.path("/broker/v1/producer/topic/topic/1").request().get();
         assertEquals(200, output.getStatus());
         assertEquals(MediaType.APPLICATION_JSON_TYPE, output.getMediaType());
         assertEquals(objectMapper.writeValueAsString(new MessageResponse()), output.readEntity(String.class));
@@ -112,17 +110,17 @@ public class QueueResourceTest {
 
     @Test
     public void getMessage_EmptyResultDataAccessException() throws JsonProcessingException {
-        when(queueDAO.getMessageByIdAndEntityName("queue", 1)).thenThrow(new EmptyResultDataAccessException(1));
+        when(topicDAO.getMessageByIdAndEntityName("topic", 1)).thenThrow(new EmptyResultDataAccessException(1));
 
-        Response output = webTarget.path("/broker/v1/producer/queue/queue/1").request().get();
+        Response output = webTarget.path("/broker/v1/producer/topic/topic/1").request().get();
         assertEquals(400, output.getStatus());
         assertEquals(MediaType.APPLICATION_JSON_TYPE, output.getMediaType());
-        assertEquals(objectMapper.writeValueAsString(new ResponseMessage("In queue : 'queue' no message with id : '1'")), output.readEntity(String.class));
+        assertEquals(objectMapper.writeValueAsString(new ResponseMessage("In topic : 'topic' no message with id : '1'")), output.readEntity(String.class));
     }
 
     @Test
     public void createMessage() throws URISyntaxException, JsonProcessingException {
-        given(queueDAO.getEntityByName("queue")).willReturn(new Queue());
+        given(topicDAO.getEntityByName("topic")).willReturn(new Topic());
 
         Message message = new Message();
         message.setContent("content");
@@ -130,7 +128,7 @@ public class QueueResourceTest {
         message.setTimestamp(clockService.now());
 
         Response output = webTarget
-                .path("/broker/v1/producer/queue/queue")
+                .path("/broker/v1/producer/topic/topic")
                 .request()
                 .put(Entity.json(new MessageRequest("content")));
 
@@ -142,7 +140,7 @@ public class QueueResourceTest {
     @Test
     public void createMessage_NullContent() throws JsonProcessingException {
         Response output = webTarget
-                .path("/broker/v1/producer/queue/queue")
+                .path("/broker/v1/producer/topic/topic")
                 .request()
                 .put(Entity.json(new MessageRequest()));
 
@@ -153,15 +151,15 @@ public class QueueResourceTest {
 
     @Test
     public void createMessage_EmptyResultDataAccess() throws JsonProcessingException {
-        given(queueDAO.getEntityByName("queue")).willThrow(new EmptyResultDataAccessException(1));
+        given(topicDAO.getEntityByName("topic")).willThrow(new EmptyResultDataAccessException(1));
 
         Response output = webTarget
-                .path("/broker/v1/producer/queue/queue")
+                .path("/broker/v1/producer/topic/topic")
                 .request()
                 .put(Entity.json(new MessageRequest("content")));
 
         assertEquals(400, output.getStatus());
         assertEquals(MediaType.APPLICATION_JSON_TYPE, output.getMediaType());
-        assertEquals(objectMapper.writeValueAsString(new ResponseMessage("No queue with such name")), output.readEntity(String.class));
+        assertEquals(objectMapper.writeValueAsString(new ResponseMessage("No topic with such name")), output.readEntity(String.class));
     }
 }
