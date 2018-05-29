@@ -92,6 +92,11 @@ public class QueueDAO implements SourceDAO<Queue> {
     }
 
     @Override
+    public void merge(String name) {
+        jdbcTemplate.update("MERGE INTO QUEUES (NAME) KEY (NAME) VALUES (?)", name);
+    }
+
+    @Override
     public int createMessage(Queue entity, Message message) {
         GeneratedKeyHolder holder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {

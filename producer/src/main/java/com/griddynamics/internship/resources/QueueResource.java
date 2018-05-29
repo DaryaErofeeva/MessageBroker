@@ -82,24 +82,21 @@ public class QueueResource {
         if (messageRequest.getContent() == null)
             return Response.status(400).entity(new ResponseMessage("Wrong input message format")).build();
 
-        try {
-            Message message = messageModelMapper.convertToEntity(messageRequest);
-            message.setState("put");
-            message.setTimestamp(clockService.now());
+        Message message = messageModelMapper.convertToEntity(messageRequest);
+        message.setState("put");
+        message.setTimestamp(clockService.now());
 
-            Queue queue = daoFactory.getQueueDAO().getEntityByName(name);
-            daoFactory.getQueueDAO().createMessage(queue, message);
+        daoFactory.getQueueDAO().merge(name);
+        Queue queue = daoFactory.getQueueDAO().getEntityByName(name);
+        daoFactory.getQueueDAO().createMessage(queue, message);
 
-            if (queue.getConsumers() != null && queue.getConsumers().size() > 0)
-                queueMessageSender.sendMessage(queue, message);
+        if (queue.getConsumers() != null && queue.getConsumers().size() > 0)
+            queueMessageSender.sendMessage(queue, message);
 
-            return Response
-                    .status(200)
-                    .entity(messageModelMapper.convertToResponseObject(message))
-                    .contentLocation(new URI("/broker/v1/producer/queue/" + name + "/" + message.getId()))
-                    .build();
-        } catch (EmptyResultDataAccessException ex) {
-            return Response.status(400).entity(new ResponseMessage("No queue with such name")).build();
-        }
+        return Response
+                .status(200)
+                .entity(messageModelMapper.convertToResponseObject(message))
+                .contentLocation(new URI("/broker/v1/producer/queue/" + name + "/" + message.getId()))
+                .build();
     }
 }

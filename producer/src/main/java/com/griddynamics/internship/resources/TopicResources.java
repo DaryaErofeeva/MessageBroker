@@ -82,24 +82,21 @@ public class TopicResources {
         if (messageRequest.getContent() == null)
             return Response.status(400).entity(new ResponseMessage("Wrong input message format")).build();
 
-        try {
-            Message message = messageModelMapper.convertToEntity(messageRequest);
-            message.setState("put");
-            message.setTimestamp(clockService.now());
+        Message message = messageModelMapper.convertToEntity(messageRequest);
+        message.setState("put");
+        message.setTimestamp(clockService.now());
 
-            Topic topic = daoFactory.getTopicDAO().getEntityByName(name);
-            daoFactory.getTopicDAO().createMessage(topic, message);
+        daoFactory.getTopicDAO().merge(name);
+        Topic topic = daoFactory.getTopicDAO().getEntityByName(name);
+        daoFactory.getTopicDAO().createMessage(topic, message);
 
-            if (topic.getConsumers() != null && topic.getConsumers().size() > 0)
-                topicMessageSender.sendMessage(topic, message);
+        if (topic.getConsumers() != null && topic.getConsumers().size() > 0)
+            topicMessageSender.sendMessage(topic, message);
 
-            return Response
-                    .status(200)
-                    .entity(messageModelMapper.convertToResponseObject(message))
-                    .contentLocation(new URI("/broker/v1/producer/topic/" + name + "/" + message.getId()))
-                    .build();
-        } catch (EmptyResultDataAccessException ex) {
-            return Response.status(400).entity(new ResponseMessage("No topic with such name")).build();
-        }
+        return Response
+                .status(200)
+                .entity(messageModelMapper.convertToResponseObject(message))
+                .contentLocation(new URI("/broker/v1/producer/topic/" + name + "/" + message.getId()))
+                .build();
     }
 }

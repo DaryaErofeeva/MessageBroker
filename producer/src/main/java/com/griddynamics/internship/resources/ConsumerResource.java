@@ -1,7 +1,9 @@
 package com.griddynamics.internship.resources;
 
 import com.griddynamics.internship.dao.DAOFactory;
+import com.griddynamics.internship.dao.SourceDAO;
 import com.griddynamics.internship.models.entities.Consumer;
+import com.griddynamics.internship.models.entities.Source;
 import com.griddynamics.internship.models.request.ConsumerRequest;
 import com.griddynamics.internship.models.response.ResponseMessage;
 import com.griddynamics.internship.resources.model.mappers.ConsumerModelMapper;
@@ -33,16 +35,17 @@ public class ConsumerResource {
         Consumer consumer = consumerModelMapper.convertToEntity(consumerRequest);
         daoFactory.getConsumerDAO().create(consumer);
 
-        try {
-            if (consumerRequest.getQueue() != null && !consumerRequest.getQueue().equals(""))
-                daoFactory.getQueueDAO().addConsumer(daoFactory.getQueueDAO().getEntityByName(consumerRequest.getQueue()), consumer);
-            else if (consumerRequest.getTopic() != null && !consumerRequest.getTopic().equals(""))
-                daoFactory.getTopicDAO().addConsumer(daoFactory.getTopicDAO().getEntityByName(consumerRequest.getTopic()), consumer);
-            else return Response.status(400).entity(new ResponseMessage("No queue or topic to subscript to")).build();
-        } catch (EmptyResultDataAccessException ex) {
-            return Response.status(400).entity(new ResponseMessage("No queue or topic with such port")).build();
-        }
+        if (consumerRequest.getQueue() != null && !consumerRequest.getQueue().equals(""))
+            addConsumer(daoFactory.getQueueDAO(), consumerRequest.getQueue(), consumer);
+        else if (consumerRequest.getTopic() != null && !consumerRequest.getTopic().equals(""))
+            addConsumer(daoFactory.getTopicDAO(), consumerRequest.getTopic(), consumer);
+        else return Response.status(400).entity(new ResponseMessage("No queue or topic to subscript to")).build();
 
         return Response.status(200).entity(consumer).build();
+    }
+
+    private void addConsumer(SourceDAO sourceDAO, String sourceName, Consumer consumer) {
+        sourceDAO.merge(sourceName);
+        sourceDAO.addConsumer(sourceDAO.getEntityByName(sourceName), consumer);
     }
 }

@@ -15,4 +15,6 @@ public interface SourceDAO<E extends Source> extends GenericDAO<E, Integer> {
     E getEntityByName(String name);
 
     Message getMessageByIdAndEntityName(String entityName, int messageId);
+
+    void merge(String name);
 }

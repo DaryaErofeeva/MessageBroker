@@ -148,18 +148,4 @@ public class TopicResourceTest {
         assertEquals(MediaType.APPLICATION_JSON_TYPE, output.getMediaType());
         assertEquals(objectMapper.writeValueAsString(new ResponseMessage("Wrong input message format")), output.readEntity(String.class));
     }
-
-    @Test
-    public void createMessage_EmptyResultDataAccess() throws JsonProcessingException {
-        given(topicDAO.getEntityByName("topic")).willThrow(new EmptyResultDataAccessException(1));
-
-        Response output = webTarget
-                .path("/broker/v1/producer/topic/topic")
-                .request()
-                .put(Entity.json(new MessageRequest("content")));
-
-        assertEquals(400, output.getStatus());
-        assertEquals(MediaType.APPLICATION_JSON_TYPE, output.getMediaType());
-        assertEquals(objectMapper.writeValueAsString(new ResponseMessage("No topic with such name")), output.readEntity(String.class));
-    }
 }

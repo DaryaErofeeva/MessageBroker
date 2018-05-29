@@ -150,18 +150,4 @@ public class QueueResourceTest {
         assertEquals(MediaType.APPLICATION_JSON_TYPE, output.getMediaType());
         assertEquals(objectMapper.writeValueAsString(new ResponseMessage("Wrong input message format")), output.readEntity(String.class));
     }
-
-    @Test
-    public void createMessage_EmptyResultDataAccess() throws JsonProcessingException {
-        given(queueDAO.getEntityByName("queue")).willThrow(new EmptyResultDataAccessException(1));
-
-        Response output = webTarget
-                .path("/broker/v1/producer/queue/queue")
-                .request()
-                .put(Entity.json(new MessageRequest("content")));
-
-        assertEquals(400, output.getStatus());
-        assertEquals(MediaType.APPLICATION_JSON_TYPE, output.getMediaType());
-        assertEquals(objectMapper.writeValueAsString(new ResponseMessage("No queue with such name")), output.readEntity(String.class));
-    }
 }

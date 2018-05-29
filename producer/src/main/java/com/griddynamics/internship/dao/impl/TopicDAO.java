@@ -92,6 +92,11 @@ public class TopicDAO implements SourceDAO<Topic> {
     }
 
     @Override
+    public void merge(String name) {
+        jdbcTemplate.update("MERGE INTO TOPICS (NAME) KEY (NAME) VALUES (?)", name);
+    }
+
+    @Override
     public int createMessage(Topic entity, Message message) {
         GeneratedKeyHolder holder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
@@ -131,7 +136,7 @@ public class TopicDAO implements SourceDAO<Topic> {
                 new Object[]{entityName, messageId}, messageMapper);
     }
 
-    public List<Topic> getAllFailed(){
+    public List<Topic> getAllFailed() {
         return jdbcTemplate.query("SELECT TOPICS.ID, TOPICS.NAME," +
                 " CONSUMERS.ID, CONSUMERS.HOST, CONSUMERS.PORT, " +
                 " TOPICS_MESSAGES.ID, TOPICS_MESSAGES.CONTENT, TOPICS_MESSAGES.STATE, TOPICS_MESSAGES.TIMESTAMP " +
@@ -139,7 +144,7 @@ public class TopicDAO implements SourceDAO<Topic> {
                 "  LEFT JOIN TOPICS_CONSUMERS ON TOPICS.ID = TOPICS_CONSUMERS.TOPIC_ID " +
                 "  LEFT JOIN CONSUMERS ON TOPICS_CONSUMERS.CONSUMER_ID = CONSUMERS.ID " +
                 "  LEFT JOIN TOPICS_MESSAGES on TOPICS.ID = TOPICS_MESSAGES.TOPIC_ID" +
-                " WHERE TOPICS_MESSAGES.STATE = 'failed'"+
+                " WHERE TOPICS_MESSAGES.STATE = 'failed'" +
                 "AND TIMESTAMPDIFF(HOUR, TOPICS_MESSAGES.TIMESTAMP, TIMESTAMPADD(HOUR, 3, NOW())) < 5", topicExtractor);
     }
 }
