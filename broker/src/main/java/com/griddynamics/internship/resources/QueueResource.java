@@ -1,14 +1,15 @@
 package com.griddynamics.internship.resources;
 
-import com.fasterxml.jackson.annotation.JsonRootName;
+import com.griddynamics.internship.ClockService;
 import com.griddynamics.internship.dao.DAOFactory;
-import com.griddynamics.internship.models.db.QueueMessage;
-import com.griddynamics.internship.models.request.QueueMessageRequest;
-import com.griddynamics.internship.models.response.QueueResponse;
-import com.griddynamics.internship.models.response.ResponseError;
-import com.griddynamics.internship.models.response.plural.QueuesResponses;
-import com.griddynamics.internship.resources.models.mappers.QueueMessageModelMapper;
-import com.griddynamics.internship.resources.models.mappers.QueueModelMapper;
+import com.griddynamics.internship.models.entities.Message;
+import com.griddynamics.internship.models.entities.Queue;
+import com.griddynamics.internship.models.request.MessageRequest;
+import com.griddynamics.internship.models.response.ResponseMessage;
+import com.griddynamics.internship.models.response.plural.QueuesResponse;
+import com.griddynamics.internship.resources.model.mappers.MessageModelMapper;
+import com.griddynamics.internship.resources.model.mappers.QueueModelMapper;
+import com.griddynamics.internship.resources.senders.QueueMessageSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.MediaType;
@@ -18,12 +19,9 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.List;
 
 @Controller
-@JsonRootName("queue")
 @Path("/broker/v1/producer/queue")
 public class QueueResource {
 
@@ -34,21 +32,22 @@ public class QueueResource {
     private QueueModelMapper queueModelMapper;
 
     @Autowired
-    private QueueMessageModelMapper queueMessageModelMapper;
+    private MessageModelMapper messageModelMapper;
+
+    @Autowired
+    private QueueMessageSender queueMessageSender;
+
+    @Autowired
+    private ClockService clockService;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON_VALUE)
     public Response getAllQueues() {
-        QueuesResponses queuesResponses = new QueuesResponses();
-
-        List<QueueResponse> queues = new ArrayList<>();
+        QueuesResponse queuesResponses = new QueuesResponse();
+        queuesResponses.setQueues(new ArrayList<>());
         daoFactory.getQueueDAO()
                 .getAll()
-                .stream()
-                .forEach(queue -> queues.add(queueModelMapper.convertToResponseObject(queue)));
-
-        queuesResponses.setQueues(queues);
-
+                .forEach(queue -> queuesResponses.getQueues().add(queueModelMapper.convertToResponseObject(queue)));
         return Response.status(200).entity(queuesResponses).build();
     }
 
@@ -59,47 +58,45 @@ public class QueueResource {
         try {
             return Response.status(200).entity(queueModelMapper.convertToResponseObject(daoFactory.getQueueDAO().getEntityByName(name))).build();
         } catch (EmptyResultDataAccessException ex) {
-            return Response.status(400).entity(new ResponseError("No queue with such name")).build();
+            return Response.status(400).entity(new ResponseMessage("No queue with such name")).build();
         }
     }
 
     @GET
     @Path("/{name}/{id}")
     @Produces(MediaType.APPLICATION_JSON_VALUE)
-    public Response getQueueMessage(@PathParam("name") String name, @PathParam("id") int id) {
+    public Response getMessage(@PathParam("name") String name, @PathParam("id") int id) {
         try {
-            QueueMessage queueMessage = daoFactory.getQueueMessageDAO().getEntityById(id);
-
-            if (!queueMessage.getQueue().getName().equals(name))
-                return Response.status(400).entity(new ResponseError("Message with id = " + id + " belongs to another queue")).build();
-
-            return Response.status(200).entity(queueMessageModelMapper.convertToResponseObject(queueMessage)).build();
-        } catch (NullPointerException ex) {
-            return Response.status(400).entity(new ResponseError("No message with such id: " + id)).build();
+            return Response.status(200).entity(messageModelMapper.convertToResponseObject(daoFactory.getQueueDAO().getMessageByIdAndEntityName(name, id))).build();
+        } catch (EmptyResultDataAccessException ex) {
+            return Response.status(400).entity(new ResponseMessage("In queue : '" + name + "' no message with id : '" + id + "'")).build();
         }
     }
-
 
     @PUT
     @Path("/{name}")
     @Consumes(MediaType.APPLICATION_JSON_VALUE)
     @Produces(MediaType.APPLICATION_JSON_VALUE)
-    public Response updateMessage(@PathParam("name") String name, QueueMessageRequest message) throws URISyntaxException {
-        if (message.getMessageId() == 0 || message.getState() == null)
-            return Response.status(400).entity(new ResponseError("Wrong input message format")).entity(new QueueMessageRequest()).build();
+    public Response createMessage(@PathParam("name") String name, MessageRequest messageRequest) throws URISyntaxException {
 
-        try {
-            QueueMessage queueMessage = queueMessageModelMapper.convertToEntity(message, name);
-            queueMessage.setTimestamp(new Timestamp(System.currentTimeMillis()));
-            queueMessage.setId(daoFactory.getQueueMessageDAO().create(queueMessage));
+        if (messageRequest.getContent() == null)
+            return Response.status(400).entity(new ResponseMessage("Wrong input message format")).build();
 
-            return Response
-                    .status(200)
-                    .entity(queueMessageModelMapper.convertToResponseObject(queueMessage))
-                    .contentLocation(new URI("/broker/v1/producer/queue/" + name + "/" + queueMessage.getId()))
-                    .build();
-        } catch (EmptyResultDataAccessException ex) {
-            return Response.status(400).entity(new ResponseError("No queue with such name")).build();
-        }
+        Message message = messageModelMapper.convertToEntity(messageRequest);
+        message.setState("put");
+        message.setTimestamp(clockService.now());
+
+        daoFactory.getQueueDAO().merge(name);
+        Queue queue = daoFactory.getQueueDAO().getEntityByName(name);
+        daoFactory.getQueueDAO().createMessage(queue, message);
+
+        if (queue.getConsumers() != null && queue.getConsumers().size() > 0)
+            queueMessageSender.sendMessage(queue, message);
+
+        return Response
+                .status(200)
+                .entity(messageModelMapper.convertToResponseObject(message))
+                .contentLocation(new URI("/broker/v1/producer/queue/" + name + "/" + message.getId()))
+                .build();
     }
 }

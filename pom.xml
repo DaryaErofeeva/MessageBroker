@@ -9,11 +9,9 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>creator</module>
-        <module>reader</module>
-        <module>watcher</module>
         <module>broker</module>
         <module>producer</module>
+        <module>consumer</module>
     </modules>
 
     <parent>

@@ -2,7 +2,7 @@ package com.griddynamics.internship.dao.impl;
 
 import com.griddynamics.internship.dao.GenericDAO;
 import com.griddynamics.internship.dao.row.mappers.ConsumerMapper;
-import com.griddynamics.internship.models.db.Consumer;
+import com.griddynamics.internship.models.entities.Consumer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -14,7 +14,6 @@ import java.util.List;
 
 @Repository
 public class ConsumerDAO implements GenericDAO<Consumer, Integer> {
-
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -28,8 +27,8 @@ public class ConsumerDAO implements GenericDAO<Consumer, Integer> {
 
     @Override
     public int update(Consumer entity) {
-        return jdbcTemplate.update("UPDATE CONSUMERS SET NAME = ? WHERE ID = ?",
-                entity.getName(), entity.getId());
+        return jdbcTemplate.update("UPDATE CONSUMERS SET HOST = ?, PORT = ? WHERE ID = ?",
+                entity.getPort(), entity.getId());
     }
 
     @Override
@@ -45,16 +44,14 @@ public class ConsumerDAO implements GenericDAO<Consumer, Integer> {
 
     @Override
     public int create(Consumer entity) {
-
         GeneratedKeyHolder holder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO CONSUMERS (NAME) VALUES (?)", Statement.RETURN_GENERATED_KEYS);
-            statement.setString(1, entity.getName());
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO CONSUMERS (HOST, PORT) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1, entity.getHost());
+            statement.setString(2, entity.getPort());
             return statement;
         }, holder);
+        entity.setId(holder.getKey().intValue());
         return holder.getKey().intValue();
-
-//        return jdbcTemplate.update("INSERT INTO CONSUMERS (NAME) VALUES (?)",
-//                entity.getName());
     }
 }

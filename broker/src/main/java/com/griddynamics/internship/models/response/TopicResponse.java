@@ -1,16 +1,18 @@
 package com.griddynamics.internship.models.response;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+
+import java.util.List;
 
 @JsonRootName("topic")
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-@RequiredArgsConstructor
 public class TopicResponse {
     private int id;
-
-    @NonNull
     private String name;
+    private List<ConsumerResponse> consumers;
+    private List<MessageResponse> messages;
 }

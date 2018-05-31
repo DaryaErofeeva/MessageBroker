@@ -12,7 +12,7 @@ public class LogService {
 
     @Autowired
     public void setLogger() {
-        this.logger = LoggerFactory.getLogger("consumer");
+        this.logger = LoggerFactory.getLogger("broker");
     }
 
 

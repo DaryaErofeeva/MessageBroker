@@ -1,19 +1,18 @@
 package com.griddynamics.internship.models.response;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+
+import java.util.List;
 
 @JsonRootName("queue")
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-@RequiredArgsConstructor
 public class QueueResponse {
     private int id;
-
-    @NonNull
-    private ConsumerResponse consumer;
-
-    @NonNull
     private String name;
+    private List<ConsumerResponse> consumers;
+    private List<MessageResponse> messages;
 }
