@@ -1,6 +1,7 @@
 package com.griddynamics.internship.models.factories;
 
 import com.griddynamics.internship.AppConfig;
+import com.griddynamics.internship.ConsumerFactory;
 import com.griddynamics.internship.LogService;
 import com.griddynamics.internship.models.request.ConsumerRequest;
 import com.griddynamics.internship.models.response.ConsumerResponse;
