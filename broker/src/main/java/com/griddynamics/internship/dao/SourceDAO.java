@@ -1,8 +1,8 @@
 package com.griddynamics.internship.dao;
 
-import com.griddynamics.internship.models.entities.Consumer;
-import com.griddynamics.internship.models.entities.Message;
-import com.griddynamics.internship.models.entities.Source;
+import com.griddynamics.internship.models.Consumer;
+import com.griddynamics.internship.models.Message;
+import com.griddynamics.internship.models.Source;
 
 public interface SourceDAO<E extends Source> extends GenericDAO<E, Integer> {
 

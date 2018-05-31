@@ -1,4 +1,4 @@
-package com.griddynamics.internship.models.entities;
+package com.griddynamics.internship.models;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

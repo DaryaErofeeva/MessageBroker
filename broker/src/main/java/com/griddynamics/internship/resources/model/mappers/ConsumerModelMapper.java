@@ -1,6 +1,6 @@
 package com.griddynamics.internship.resources.model.mappers;
 
-import com.griddynamics.internship.models.entities.Consumer;
+import com.griddynamics.internship.models.Consumer;
 import com.griddynamics.internship.models.request.ConsumerRequest;
 import com.griddynamics.internship.models.response.ConsumerResponse;
 import org.modelmapper.ModelMapper;

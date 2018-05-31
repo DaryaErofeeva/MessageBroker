@@ -1,15 +1,14 @@
 package com.griddynamics.internship.resources.senders;
 
 import com.griddynamics.internship.dao.DAOFactory;
-import com.griddynamics.internship.models.entities.Consumer;
-import com.griddynamics.internship.models.entities.Message;
-import com.griddynamics.internship.models.entities.Queue;
-import com.griddynamics.internship.models.entities.SourceConsumerMessage;
+import com.griddynamics.internship.models.Consumer;
+import com.griddynamics.internship.models.Message;
+import com.griddynamics.internship.models.Queue;
+import com.griddynamics.internship.models.SourceConsumerMessage;
 import com.griddynamics.internship.models.response.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;

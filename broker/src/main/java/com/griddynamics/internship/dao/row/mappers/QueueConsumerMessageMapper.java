@@ -1,8 +1,8 @@
 package com.griddynamics.internship.dao.row.mappers;
 
 import com.griddynamics.internship.dao.DAOFactory;
-import com.griddynamics.internship.models.entities.Message;
-import com.griddynamics.internship.models.entities.SourceConsumerMessage;
+import com.griddynamics.internship.models.Message;
+import com.griddynamics.internship.models.SourceConsumerMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;

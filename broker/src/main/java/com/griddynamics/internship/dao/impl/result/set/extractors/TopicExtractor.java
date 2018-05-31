@@ -1,8 +1,8 @@
 package com.griddynamics.internship.dao.impl.result.set.extractors;
 
-import com.griddynamics.internship.models.entities.Consumer;
-import com.griddynamics.internship.models.entities.Message;
-import com.griddynamics.internship.models.entities.Topic;
+import com.griddynamics.internship.models.Consumer;
+import com.griddynamics.internship.models.Message;
+import com.griddynamics.internship.models.Topic;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;

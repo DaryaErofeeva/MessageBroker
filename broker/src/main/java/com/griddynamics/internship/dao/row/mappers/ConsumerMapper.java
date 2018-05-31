@@ -1,6 +1,6 @@
 package com.griddynamics.internship.dao.row.mappers;
 
-import com.griddynamics.internship.models.entities.Consumer;
+import com.griddynamics.internship.models.Consumer;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 

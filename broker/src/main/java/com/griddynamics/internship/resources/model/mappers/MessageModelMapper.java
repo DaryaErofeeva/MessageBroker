@@ -1,6 +1,6 @@
 package com.griddynamics.internship.resources.model.mappers;
 
-import com.griddynamics.internship.models.entities.Message;
+import com.griddynamics.internship.models.Message;
 import com.griddynamics.internship.models.request.MessageRequest;
 import com.griddynamics.internship.models.response.MessageResponse;
 import org.modelmapper.ModelMapper;

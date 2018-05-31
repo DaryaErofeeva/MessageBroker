@@ -1,6 +1,5 @@
-package com.griddynamics.internship.models.factories;
+package com.griddynamics.internship;
 
-import com.griddynamics.internship.LogService;
 import com.griddynamics.internship.models.request.ConsumerRequest;
 import com.griddynamics.internship.models.response.ConsumerResponse;
 import com.griddynamics.internship.models.response.ResponseMessage;
@@ -8,7 +7,6 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;

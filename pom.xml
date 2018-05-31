@@ -12,6 +12,7 @@
         <module>broker</module>
         <module>producer</module>
         <module>consumer</module>
+        <module>rest-models</module>
     </modules>
 
     <parent>

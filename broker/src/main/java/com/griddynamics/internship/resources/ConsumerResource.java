@@ -2,13 +2,11 @@ package com.griddynamics.internship.resources;
 
 import com.griddynamics.internship.dao.DAOFactory;
 import com.griddynamics.internship.dao.SourceDAO;
-import com.griddynamics.internship.models.entities.Consumer;
-import com.griddynamics.internship.models.entities.Source;
+import com.griddynamics.internship.models.Consumer;
 import com.griddynamics.internship.models.request.ConsumerRequest;
 import com.griddynamics.internship.models.response.ResponseMessage;
 import com.griddynamics.internship.resources.model.mappers.ConsumerModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 

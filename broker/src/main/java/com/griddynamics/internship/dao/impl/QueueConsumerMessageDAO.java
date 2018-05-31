@@ -2,12 +2,10 @@ package com.griddynamics.internship.dao.impl;
 
 import com.griddynamics.internship.dao.GenericDAO;
 import com.griddynamics.internship.dao.row.mappers.QueueConsumerMessageMapper;
-import com.griddynamics.internship.models.entities.Consumer;
-import com.griddynamics.internship.models.entities.SourceConsumerMessage;
+import com.griddynamics.internship.models.SourceConsumerMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;

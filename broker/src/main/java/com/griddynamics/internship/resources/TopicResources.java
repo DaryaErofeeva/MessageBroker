@@ -3,8 +3,8 @@ package com.griddynamics.internship.resources;
 import com.griddynamics.internship.ClockService;
 import com.griddynamics.internship.dao.DAOFactory;
 import com.griddynamics.internship.resources.senders.TopicMessageSender;
-import com.griddynamics.internship.models.entities.Message;
-import com.griddynamics.internship.models.entities.Topic;
+import com.griddynamics.internship.models.Message;
+import com.griddynamics.internship.models.Topic;
 import com.griddynamics.internship.models.request.MessageRequest;
 import com.griddynamics.internship.models.response.ResponseMessage;
 import com.griddynamics.internship.models.response.plural.TopicsResponse;
@@ -19,7 +19,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 
 @Controller
