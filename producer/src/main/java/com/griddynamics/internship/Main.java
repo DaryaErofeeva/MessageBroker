@@ -26,16 +26,20 @@ public class Main implements CommandLineRunner {
 
     public static void main(String[] args) {
         try (ServerSocket serverSocket = new ServerSocket(0)) {
-            System.setProperty("server.host", InetAddress.getLoopbackAddress().getHostName());
+            System.setProperty("server.host", InetAddress.getLocalHost().getHostAddress());
             System.setProperty("server.port", String.valueOf(serverSocket.getLocalPort()));
         } catch (IOException ex) {
             ex.printStackTrace();
         }
 
+        System.out.println(System.getProperty("server.host")+":"+System.getProperty("server.port"));
+
         SpringApplication app = new SpringApplication(Main.class);
         app.setBannerMode(Banner.Mode.OFF);
         app.run(args);
     }
+
+
 
     @Override
     public void run(String... args) {
