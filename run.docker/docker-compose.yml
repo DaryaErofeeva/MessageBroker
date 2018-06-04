@@ -1,0 +1,62 @@
+version: "3"
+services:
+  db:
+    image: 1000kit/h2
+    ports:
+      - "8081:8081"
+      - "1521:1521"
+    volumes:
+      - "/Users/dariayerofieieva/Projects/Java/GridDynamics/docker-1000kit-h2:/opt/h2-data"
+
+
+  broker:
+    image: dyerofieieva/broker
+    ports:
+      - "8080:8080"
+    volumes:
+      - "/Users/dariayerofieieva/Projects/Java/GridDynamics/MessageBroker/broker/target:/app"
+    environment:
+      - "spring.datasource.url=jdbc:h2:tcp://db:1521/msg_broker"
+      - "spring.datasource.username=root"
+      - "spring.datasource.password="
+      - "spring.datasource.driver-class-name=org.h2.Driver"
+    depends_on:
+      - db
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://broker:8080"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  wait:
+      image: waisbrot/wait
+      links:
+        - broker
+      environment:
+        - TARGETS=broker:8080
+
+
+  producer:
+    image: dyerofieieva/broker
+    volumes:
+      - "/Users/dariayerofieieva/Projects/Java/GridDynamics/MessageBroker/producer/target:/app"
+    environment:
+      - "BROKER_HOST=broker"
+      - "BROKER_PORT=8080"
+      - "TOPIC=topic1"
+      - "MESSAGES=5"
+    depends_on:
+      - wait
+
+
+  consumer:
+    image: dyerofieieva/broker
+    volumes:
+      - "/Users/dariayerofieieva/Projects/Java/GridDynamics/MessageBroker/consumer/target:/app"
+    environment:
+      - "broker.host=broker"
+      - "broker.port=8080"
+      - "topic=topic1"
+    depends_on:
+      - wait
